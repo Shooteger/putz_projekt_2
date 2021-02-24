@@ -19,7 +19,7 @@ src = ['src/main.cpp']
 executable('connectionsim',
             sources : src,
             include_directories : inc_dir,
-            dependencies : thread_dep,
+            dependencies : [thread_dep]
             #link_with : XXX_lib
            )
 
