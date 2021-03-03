@@ -15,6 +15,9 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/async.h"
 
+#include "server.h"
+#include "client.h"
+
 using namespace std;
 
 //returns vector of ascii character
@@ -44,25 +47,24 @@ vector<char> create_random_ascii(string allowed_ascii_signs="") {
 }
 
 int main() {
-    /*
+    
     asio::error_code ec;
 
     asio::io_context context;
 
-    asio::ip::tcp::endpoint endpoint(asio::ip::make_address("127.0.0.1", ec), 80);
+    asio::ip::tcp::endpoint endpoint(asio::ip::make_address("127.0.0.1", ec), 8888); //gehört zu server
 
     asio::ip::tcp::socket socket(context);
 
     if (!ec) {
         cout << "Connected...\n";
+        vector<char> test = create_random_ascii("mpFAwsds6");
+    
+        for (size_t i=0; i < test.size(); ++i) {
+            cout << test.at(i) << "\n";
+        }
     } else {
         cout << "Connection failed to address:\n" << ec.message() << "\n";
-    }*/
-
-    vector<char> test = create_random_ascii("mpFAwsds6");
-    
-    for (size_t i=0; i < test.size(); ++i) {
-        cout << test.at(i) << "\n";
     }
     
 }
