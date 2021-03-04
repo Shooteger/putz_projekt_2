@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**", "/home/maurice/Documents/cpp_libraries/cli11", "/home/maurice/Documents/cpp_libraries/spdlog/include/",
-                "/home/maurice/Documents/cpp_libraries/asio/include/"
+                "/home/maurice/Documents/cpp_libraries/asio/include/", "/home/maurice/Documents/cpp_libraries/tabulate/single_include/", "/home/maurice/Documents/cpp_libraries/rang/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
