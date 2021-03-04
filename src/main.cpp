@@ -44,6 +44,8 @@ vector<char> create_random_ascii(string allowed_ascii_signs="") {
 }
 
 int main() {
+    const string hostname = "127.0.0.1";
+    const int port = 8477; 
     /*
     asio::error_code ec;
 
