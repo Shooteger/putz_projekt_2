@@ -1,0 +1,43 @@
+* Changelog
+** [Unreleased] - 08.02.2021
+*** Commit-Tickets
+/fba28d1c14a34edd5633145cb0a64749c676770d
+/d56276c1ee8cfe9b3c8767f3b726832cec039b2c
+/81a898601540d1d80d2a00a1dcc7d055d6f5bab3
+/a6db3896b2eb8ea87924ded302beb1af5081ff50
+***Added
+-license
+-initial commit
+
+** [Unreleased] - 15.02.2021
+*** Commit-Tickets
+/646ed7d17e982c1aa7db296ce85f92f079f910a7
+*** Added
+-extern libraries
+*** Changed
+-meson_options and build 
+
+** [Unreleased] - 22.02.2021
+*** Commit-Tickets
+
+** [Unreleased] - 01.03.2021
+*** Commit-Tickets
+/a65bc0dced3b375efcdc08e77c50ede5133da924
+/c38d633f640c3ac09f7b43095dea287bd1d52638
+*** Added
+-generate random ascii values random times
+*** Changed
+-meson build
+
+** [Unreleased] - 08.03.2021
+*** Commit-Tickets
+/04d2de88a5cb8d15e6473922484abb2e5b3f5239
+/62730148d297bc764bc3062242ead962899e571d
+/801e71c267e3a37a7b30c067db3e6c5d10bd7edc
+/ee6fa8131e4471c4b341de00896dbdbb666bc0d3
+/bc4247bb8d417439aaeecb2aaa96f2d260378323
+/b5cd862064b9d90a81f61596e3f5eb06be1bbe96
+*** Added
+-build directory
+-tabulate class use
+-CLI parsing and input of allowed ascii values with console

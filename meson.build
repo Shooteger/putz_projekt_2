@@ -16,7 +16,7 @@ inc_dir = include_directories(['include',
 
 #subdir('XXX')
 
-src = ['src/main.cpp']
+src = ['src/main.cpp', 'src/client.cpp', 'src/server.cpp']
 
 executable('connectionsim',
             sources : src,
