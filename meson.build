@@ -16,10 +16,17 @@ inc_dir = include_directories(['include',
 
 #subdir('XXX')
 
-src = ['src/main.cpp', 'src/client.cpp', 'src/server.cpp']
+src = ['src/main.cpp', 'src/client.cpp']
 
 executable('connectionsim',
             sources : src,
+            include_directories : inc_dir,
+            dependencies : [thread_dep]
+            #link_with : XXX_lib
+           )
+
+executable('server',
+            sources : ['src/server.cpp'],
             include_directories : inc_dir,
             dependencies : [thread_dep]
             #link_with : XXX_lib

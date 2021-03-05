@@ -1,6 +1,6 @@
 //          Copyright Maurice Putz 2021.
 // Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file boost_license.txt)
+//    (See accompanying file LICENSE)
 
 #include <iostream>
 #include <stdio.h>
@@ -20,7 +20,7 @@
 #pragma GCC diagnostic pop
 
 #include "server.h"
-#include "client.h"
+//#include "client.h"
 
 using namespace std;
 using namespace tabulate;
@@ -56,6 +56,19 @@ vector<char> create_random_ascii(string allowed_ascii_signs="") {
     return res;
 }
 
+string receive_data(asio::ip::tcp::socket& socket) {
+  //only temporarily, here the sliding window algorithm will take place;
+  asio::streambuf sbf;
+  asio::read_until(socket, sbf, "\n");
+  string data = asio::buffer_cast<const char*>(sbf.data());
+  return data;
+}
+
+void send_data(asio::ip::tcp::socket& socket, const string message) {
+  write(socket, asio::buffer(message + "\n"));
+}
+
+
 int main(int argc, char* argv[]) {
     string input_chars;
     bool a = false;
@@ -76,9 +89,23 @@ int main(int argc, char* argv[]) {
 
     if (!a) {
         const vector<char> test = create_random_ascii(input_chars);
+        
+        asio::io_context context;
+        asio::ip::tcp::socket socket(context);
+        socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 9999));
+
+        string response;
+        string tmp;
+
         for (size_t i=0; i < test.size(); ++i) {
-            cout << test.at(i) << "\n";
+            //cout << test.at(i) << "\n";
+            tmp = "";
+            tmp.push_back(test.at(i));
+            send_data(socket, tmp);
+            response = receive_data(socket);
+            cout << "[Client]" << response;
         }
+
     } else {
         cout << rang::fg::magenta << "\n\n Allowed characters are: \n\n" << rang::style::reset;
         Table ascii_table;
@@ -93,15 +120,8 @@ int main(int argc, char* argv[]) {
         cout << ascii_table << "\n";
     }
     /*
-
-    asio::error_code ec;
-
-    asio::io_context context;
-
-    asio::ip::tcp::endpoint endpoint(asio::ip::make_address("127.0.0.1", ec), 8888); //gehört zu server
-
-    asio::ip::tcp::socket socket(context);
     
+    asio::io_context context;
 
     if (!ec) {
         cout << "Connected...\n";

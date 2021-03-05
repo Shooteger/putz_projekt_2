@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "bitset": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "iosfwd": "cpp",
+        "*.ipp": "cpp",
+        "vector": "cpp",
+        "system_error": "cpp"
     }
 }
