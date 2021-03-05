@@ -37,7 +37,13 @@
 /ee6fa8131e4471c4b341de00896dbdbb666bc0d3
 /bc4247bb8d417439aaeecb2aaa96f2d260378323
 /b5cd862064b9d90a81f61596e3f5eb06be1bbe96
+/9ef5b29e8ef03802472af61cb97aa6cbdec1017c
+/ebf6092b50fdfbfc239c3a689ac078dd5977325e
+/393c1a926e52824d716fa7c7a2ebe3443852be32
+/5411f9ae486a8d33971b9c3b11ab109bd6552a86
 *** Added
 -build directory
 -tabulate class use
 -CLI parsing and input of allowed ascii values with console
+-Basic synchron server/client communication
+-Basic character sending

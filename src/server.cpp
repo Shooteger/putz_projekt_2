@@ -16,6 +16,18 @@ string Server::receive_data(asio::ip::tcp::socket& socket) {
   return data;
 }
 
+/*
+void Server::grab_data(asio::ip::tcp::socket& socket) {
+  socket.async_read_some(asio::buffer(vBuffer.data(), vBuffer.size()),
+                            [&](error_code ec, size_t length)) {
+    if (!ec) {
+      cout << "Read\n";
+
+    }
+  }
+}
+*/
+
 void Server::send_data(asio::ip::tcp::socket& socket, const string message) {
   write(socket, asio::buffer(message + "\n"));
 }
@@ -25,11 +37,13 @@ Server::Server(asio::io_context& io_context, int port, string ip_adress) {
   asio::ip::tcp::acceptor server_acceptor(io_context, 
                                           asio::ip::tcp::endpoint(asio::ip::make_address(ip_adress, ec), port));
 
+  
   if (!ec || ec == asio::error::eof) {
     cout << "[Server] Client Connected\n";
     asio::ip::tcp::socket socket(io_context);
     server_acceptor.accept(socket); //wait for input
 
+    
     while (true) {
       try {
         string res = receive_data(socket);//TEMP implementation here, later sliding window
