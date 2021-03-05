@@ -5,6 +5,9 @@
         "iosfwd": "cpp",
         "*.ipp": "cpp",
         "vector": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "any": "cpp",
+        "optional": "cpp",
+        "variant": "cpp"
     }
 }

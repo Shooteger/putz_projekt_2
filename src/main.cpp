@@ -20,7 +20,6 @@
 #pragma GCC diagnostic pop
 
 #include "server.h"
-//#include "client.h"
 
 using namespace std;
 using namespace tabulate;
@@ -89,21 +88,26 @@ int main(int argc, char* argv[]) {
 
     if (!a) {
         const vector<char> test = create_random_ascii(input_chars);
-        
+
+        asio::error_code ec;
         asio::io_context context;
         asio::ip::tcp::socket socket(context);
-        socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), 9999));
+        socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1", ec), 9999));
 
-        string response;
-        string tmp;
+        if (!ec) {
+            string response;
+            string tmp;
 
-        for (size_t i=0; i < test.size(); ++i) {
-            //cout << test.at(i) << "\n";
-            tmp = "";
-            tmp.push_back(test.at(i));
-            send_data(socket, tmp);
-            response = receive_data(socket);
-            cout << "[Client]" << response;
+            for (size_t i=0; i < test.size(); ++i) {
+                tmp = "";
+                tmp.push_back(test.at(i));
+                send_data(socket, tmp);
+                response = receive_data(socket);
+                cout << "[Client] " << response;
+            }
+            socket.close(ec);
+        } else {
+            cout << "[Client] Connection was not closed as intended:\n" << ec.message();
         }
 
     } else {
@@ -119,19 +123,4 @@ int main(int argc, char* argv[]) {
         }
         cout << ascii_table << "\n";
     }
-    /*
-    
-    asio::io_context context;
-
-    if (!ec) {
-        cout << "Connected...\n";
-        vector<char> test = create_random_ascii("mpFAwsds6");
-    
-        for (size_t i=0; i < test.size(); ++i) {
-            cout << test.at(i) << "\n";
-        }
-    } else {
-        cout << "Connection failed to address:\n" << ec.message() << "\n";
-    }
-    */
 }
