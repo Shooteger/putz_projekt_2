@@ -79,15 +79,18 @@ int main(int argc, char* argv[]) {
     app.add_option("-w,--windowsize", window_size,
          "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"");
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
+    app.add_flag("-e,--exit", a , "Disconnects client and shutsdown server");
 
     //NOTE ADD WHICH ASCII CHARACTERS ARE ALLOWED! 33 until 129 in dec!
     cout << rang::fg::cyan;
     try {
         CLI11_PARSE(app, argc, argv);
     } catch(const CLI::ParseError &e) {
+        cout << rang::fg::red;
         logger->error("Program terminated because of parse exception: {0}", e.what());
         return app.exit(e);
     }
+    cout << rang::style::reset;
 
     if (!a) {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
@@ -103,7 +106,7 @@ int main(int argc, char* argv[]) {
             send_data(socket, window_size);
             response = receive_data(socket);
             response.pop_back();    //here is stucked an hour, freaking \n remove!!!
-            cout << response;
+            //cout << window_size << "; \n";
 
             if (response == "[SERVER]WS_ACN") { //check if window size acn
                 
@@ -113,12 +116,12 @@ int main(int argc, char* argv[]) {
 
                 if (response == "[SERVER]F_ACN") { //check if frames count acn
                     for (size_t i=0; i < ascii_vec.size(); ++i) {
-                        tmp = "";
-                        tmp.push_back(ascii_vec.at(i));
-                        send_data(socket, tmp);
+                        //tmp = "";
+                        //tmp.push_back(ascii_vec.at(i));
+                        //send_data(socket, tmp);
+                        send_data(socket, to_string(ascii_vec.at(i)));
                         response = receive_data(socket);
                         cout << "[Client] " << response;
-                    
                     }
                     socket.close(ec);
                     cout << "[Client] Disconnected!\n";
@@ -141,8 +144,10 @@ int main(int argc, char* argv[]) {
         }
 
     } else {
-        cout << rang::fg::magenta << "\n\n Allowed characters are: \n\n" << rang::style::reset;
+        cout << rang::fg::magenta << "\n\nAllowed characters are:\n\n" << rang::style::reset;
         Table ascii_table;
+        ascii_table.format().corner_color(Color::magenta).border_color(Color::magenta)
+            .font_style({FontStyle::bold}).font_color(Color::cyan);
         ascii_table.add_row({"Character", "ASCII Value"});
         int cnt = 33;
         string tmp;

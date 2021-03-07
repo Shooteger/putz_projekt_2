@@ -29,54 +29,55 @@ int main() {
   asio::ip::tcp::acceptor server_acceptor(context, 
                                           asio::ip::tcp::endpoint(asio::ip::make_address("127.0.0.1", ec), 9999));
   if (!ec) {
-    cout << "[Server] Client Connected\n";
+    cout << "[Server] Client connected\n";
     asio::ip::tcp::socket socket(context);
     server_acceptor.accept(socket); //wait for input
 
-    //first sent information is size if window
-    while(true) {
-      try {
-        string window_size = server.receive_data(socket);
-        window_size.pop_back();
-        server.send_data(socket, "[SERVER]WS_ACN");
-        break;
-      } catch (std::system_error const& ex) {
-        //should be raised after last char receiving
-        cout << "[SERVER] Window size not valid";
-      }
-    }
-    
     string number_of_sended_frames;
     while(true) {
+      server_acceptor.listen(1);
+      //gets size if windows
       try {
-        number_of_sended_frames = server.receive_data(socket);
-        number_of_sended_frames.pop_back();
-        server.send_data(socket, "[SERVER]F_ACN");
-        break;
+          string window_size = server.receive_data(socket);
+          window_size.pop_back();
+          server.send_data(socket, "[SERVER]WS_ACN");
       } catch (std::system_error const& ex) {
-        //should be raised after last char receiving
-        cout << "[SERVER] Number of receiving frames not valid";
+          cout << "[SERVER] Window size not valid\n"; //later logging here
+          break;
       }
-    }
-
-    int cnt = 0;
-    while (cnt < std::stoi(number_of_sended_frames)) {
+      
+      //gets maximum of sent frames
       try {
-        string res = server.receive_data(socket);
-        res.pop_back();
+          number_of_sended_frames = server.receive_data(socket);
+          number_of_sended_frames.pop_back();
+          server.send_data(socket, "[SERVER]F_ACN");
+      } catch (std::system_error const& ex) {
+          cout << "[SERVER] Number of receiving frames not valid\n"; //later logging here
+          break;
+      }
 
-        if (res == "exit") {
-          cout << "[Server] Client Disconneted\n";
+      int cnt = 0;
+      while (cnt < std::stoi(number_of_sended_frames)) {
+        try {
+          string res = server.receive_data(socket);
+          res.pop_back();
+
+          if (res == "exit") {
+            cout << "[Server] Client disconneted\n";
+            break;
+          }
+
+          cout << "[Server] " << res << "\n";
+          server.send_data(socket, res);
+        } catch (std::system_error const& ex) {
+          //should be raised after last char receiving
           break;
         }
-
-        cout << "[Server] " << res << "\n";
-        server.send_data(socket, res);
-      } catch (std::system_error const& ex) {
-        //should be raised after last char receiving
-        break;
+        cnt++;
       }
-      cnt++;
+
+      server_acceptor.cancel(); //end client connection
+      break;
     }
   } else {
     cout << "Connection failed to server with address:\n" << ec.message() << "\n";
