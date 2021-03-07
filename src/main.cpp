@@ -70,11 +70,14 @@ void send_data(asio::ip::tcp::socket& socket, const string message) {
 
 int main(int argc, char* argv[]) {
     string input_chars;
+    string window_size = "3";
     bool a = false;
     
     CLI::App app {"Networking Simulator"};
     app.add_option("input_characters", input_chars,
-         "Given characters will be random times send to Server    Example: \"./connectsim asdf\"");
+         "Given characters will be random times send to server    Example: \"./connectsim asdf\"");
+    app.add_option("-w,--windowsize", window_size,
+         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"");
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
 
     //NOTE ADD WHICH ASCII CHARACTERS ARE ALLOWED! 33 until 129 in dec!
@@ -87,8 +90,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!a) {
-        const vector<char> test = create_random_ascii(input_chars);
-
+        const vector<char> ascii_vec = create_random_ascii(input_chars);
         asio::error_code ec;
         asio::io_context context;
         asio::ip::tcp::socket socket(context);
@@ -97,17 +99,45 @@ int main(int argc, char* argv[]) {
         if (!ec) {
             string response;
             string tmp;
+            
+            send_data(socket, window_size);
+            response = receive_data(socket);
+            response.pop_back();    //here is stucked an hour, freaking \n remove!!!
+            cout << response;
 
-            for (size_t i=0; i < test.size(); ++i) {
-                tmp = "";
-                tmp.push_back(test.at(i));
-                send_data(socket, tmp);
+            if (response == "[SERVER]WS_ACN") { //check if window size acn
+                
+                send_data(socket, to_string(ascii_vec.size()));
                 response = receive_data(socket);
-                cout << "[Client] " << response;
+                response.pop_back();
+
+                if (response == "[SERVER]F_ACN") { //check if frames count acn
+                    for (size_t i=0; i < ascii_vec.size(); ++i) {
+                        tmp = "";
+                        tmp.push_back(ascii_vec.at(i));
+                        send_data(socket, tmp);
+                        response = receive_data(socket);
+                        cout << "[Client] " << response;
+                    
+                    }
+                    socket.close(ec);
+                    cout << "[Client] Disconnected!\n";
+                } else {
+                    socket.close();
+                    cout << rang::fg::red;
+                    throw std::invalid_argument("[Client] Server responded with wrong ACN for number of frames\nFor security measures connection is closed.");
+                    cout << rang::style::reset;
+                }
+            } else {
+                socket.close();
+                cout << rang::fg::red;
+                throw std::invalid_argument("[Client] Server responded with wrong ACN for window size\nFor security measures connection is closed.");
+                cout << rang::style::reset;
             }
-            socket.close(ec);
         } else {
+            cout << rang::fg::red;
             cout << "[Client] Connection was not closed as intended:\n" << ec.message();
+            cout << rang::style::reset;
         }
 
     } else {

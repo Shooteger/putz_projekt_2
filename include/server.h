@@ -11,7 +11,7 @@ class Server {
   public:
     std::string receive_data(asio::ip::tcp::socket& socket);
     void send_data(asio::ip::tcp::socket& socket, const std::string message);
-    Server(asio::io_context& io_context, int port, std::string ip_adress);
+    //Server(asio::io_context& io_context, int port, std::string ip_adress);
     Server(){};
 
     //void grab_data(asio::ip::tcp::socket& socket);
