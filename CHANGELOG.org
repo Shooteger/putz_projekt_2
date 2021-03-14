@@ -1,4 +1,11 @@
 * Changelog
+** How to use Commit tickets:
+***
+Use fixed Link part: https://github.com/Shooteger/putz_projekt_2/commit/
+After "commit/" you have to paste the string from Commit Tickets like /fba28d1c14a34edd5633145cb0a64749c676770d
+Example: https://github.com/Shooteger/putz_projekt_2/commit/fba28d1c14a34edd5633145cb0a64749c676770d
+This will redirect you to a detailed view, which each commit changed in the project
+
 ** [Unreleased] - 08.02.2021
 *** Commit-Tickets
 /fba28d1c14a34edd5633145cb0a64749c676770d
@@ -41,9 +48,18 @@
 /ebf6092b50fdfbfc239c3a689ac078dd5977325e
 /393c1a926e52824d716fa7c7a2ebe3443852be32
 /5411f9ae486a8d33971b9c3b11ab109bd6552a86
+/35ea4f257c2e8299fe0ba10a4df2f01ec73cf878
+/447dd7ccd706514db4f2304bcd8874136bc5d81f
+/2e776b5d5ee58e941abcab21598f0b4cb7fca87d
 *** Added
 -build directory
 -tabulate class use
 -CLI parsing and input of allowed ascii values with console
 -Basic synchron server/client communication
 -Basic character sending
+
+** [Unreleased] - 15.03.2021
+*** Commit-Tickets
+/2095152be03482df2ee39cf18918ae6ca7a99870
+*** Added
+-basic sliding window technique implemented
