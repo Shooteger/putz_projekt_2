@@ -6,35 +6,11 @@ After "commit/" you have to paste the string from Commit Tickets like /fba28d1c1
 Example: https://github.com/Shooteger/putz_projekt_2/commit/fba28d1c14a34edd5633145cb0a64749c676770d
 This will redirect you to a detailed view, which each commit changed in the project
 
-** [Unreleased] - 08.02.2021
+** [Unreleased] - 15.03.2021
 *** Commit-Tickets
-/fba28d1c14a34edd5633145cb0a64749c676770d
-/d56276c1ee8cfe9b3c8767f3b726832cec039b2c
-/81a898601540d1d80d2a00a1dcc7d055d6f5bab3
-/a6db3896b2eb8ea87924ded302beb1af5081ff50
-***Added
--license
--initial commit
-
-** [Unreleased] - 15.02.2021
-*** Commit-Tickets
-/646ed7d17e982c1aa7db296ce85f92f079f910a7
+/2095152be03482df2ee39cf18918ae6ca7a99870
 *** Added
--extern libraries
-*** Changed
--meson_options and build 
-
-** [Unreleased] - 22.02.2021
-*** Commit-Tickets
-
-** [Unreleased] - 01.03.2021
-*** Commit-Tickets
-/a65bc0dced3b375efcdc08e77c50ede5133da924
-/c38d633f640c3ac09f7b43095dea287bd1d52638
-*** Added
--generate random ascii values random times
-*** Changed
--meson build
+-basic sliding window technique implemented
 
 ** [Unreleased] - 08.03.2021
 *** Commit-Tickets
@@ -58,8 +34,32 @@ This will redirect you to a detailed view, which each commit changed in the proj
 -Basic synchron server/client communication
 -Basic character sending
 
-** [Unreleased] - 15.03.2021
+** [Unreleased] - 01.03.2021
 *** Commit-Tickets
-/2095152be03482df2ee39cf18918ae6ca7a99870
+/a65bc0dced3b375efcdc08e77c50ede5133da924
+/c38d633f640c3ac09f7b43095dea287bd1d52638
 *** Added
--basic sliding window technique implemented
+-generate random ascii values random times
+*** Changed
+-meson build
+
+** [Unreleased] - 22.02.2021
+*** Commit-Tickets
+
+** [Unreleased] - 15.02.2021
+*** Commit-Tickets
+/646ed7d17e982c1aa7db296ce85f92f079f910a7
+*** Added
+-extern libraries
+*** Changed
+-meson_options and build 
+
+** [Unreleased] - 08.02.2021
+*** Commit-Tickets
+/fba28d1c14a34edd5633145cb0a64749c676770d
+/d56276c1ee8cfe9b3c8767f3b726832cec039b2c
+/81a898601540d1d80d2a00a1dcc7d055d6f5bab3
+/a6db3896b2eb8ea87924ded302beb1af5081ff50
+***Added
+-license
+-initial commit

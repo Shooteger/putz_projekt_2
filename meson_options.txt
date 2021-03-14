@@ -3,7 +3,6 @@ option('cli11_include_dir', type : 'string', value : '/home/maurice/Documents/cp
 option('doctest_include_dir', type : 'string', value : '/home/maurice/Documents/cpp_libraries/doctest/', description : 'the dir containing doctest.h')
 option('json_include_dir', type : 'string', value : '/home/maurice/Documents/cpp_libraries/json/', description : 'the dir containing json.hpp')
 option('spdlog_include_dir', type : 'string', value : '/home/maurice/Documents/cpp_libraries/spdlog/include/', description : 'the include dir of spdlog')
-option('fmt_include_dir', type : 'string', value : '', description : 'the include dir of fmt')
 option('toml_include_dir', type : 'string', value : '/home/maurice/Documents/cpp_libraries/', description : 'the include dir of toml++')
 option('tabulate_include_dir', type : 'string', value : '/home/maurice/Documents/cpp_libraries/tabulate/single_include/tabulate/', description : 'the dir containing tabulate.hpp')
 option('rang_include_dir', type : 'string', value : '/home/maurice/Documents/cpp_libraries/rang/include/', description : 'the dir containing rang.hpp')

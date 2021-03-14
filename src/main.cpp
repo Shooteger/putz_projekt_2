@@ -72,6 +72,7 @@ int main(int argc, char* argv[]) {
     string input_chars;
     string window_size = "3";
     bool a = false;
+    bool l = false;
     
     CLI::App app {"Networking Simulator"};
     app.add_option("input_characters", input_chars,
@@ -79,7 +80,7 @@ int main(int argc, char* argv[]) {
     app.add_option("-w,--windowsize", window_size,
          "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::Number);
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
-    app.add_flag("-e,--exit", a , "Disconnects client and shutsdown server");
+    app.add_flag("-l,--logpath", l , "Returns path of logfile with details on console");
 
     //NOTE ADD WHICH ASCII CHARACTERS ARE ALLOWED! 33 until 129 in dec!
     cout << rang::fg::cyan;
@@ -92,7 +93,10 @@ int main(int argc, char* argv[]) {
     }
     cout << rang::style::reset;
 
-    if (!a) {
+    //system("./server");
+    //cout << "[Program] Server started\n";
+
+    if (!a && !l) {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
         asio::error_code ec;
         asio::io_context context;
@@ -100,6 +104,7 @@ int main(int argc, char* argv[]) {
         socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1", ec), 9999));
 
         if (!ec) {
+            logger->info("[Client] Client connected to server");
             string response;
             string tmp;
             
@@ -113,8 +118,9 @@ int main(int argc, char* argv[]) {
                 send_data(socket, to_string(ascii_vec.size()));
                 response = receive_data(socket);
                 response.pop_back();
-
+                //logger->info("[Client] Sliding Window Size->Server-ACN");
                 if (response == "[SERVER]F_ACN") { //check if frames count acn
+                    //logger->info("[Client] Data count->Server-ACN");
                     int w_cnt = 1; //window size counter
                     for (size_t i=0; i < ascii_vec.size(); ++i) {
                         //tmp = "";
@@ -136,22 +142,25 @@ int main(int argc, char* argv[]) {
                 } else {
                     socket.close();
                     cout << rang::fg::red;
-                    throw std::invalid_argument("[Client] Server responded with wrong ACN for number of frames\nFor security measures connection is closed.");
+                    cout << "[Client] Server responded with wrong ACN for number of data frames\nFor security measures connection is beeing closed.\n";
+                    logger->error("[Client] Server responded with wrong ACN for number of data frames");
                     cout << rang::style::reset;
                 }
             } else {
                 socket.close();
                 cout << rang::fg::red;
-                throw std::invalid_argument("[Client] Server responded with wrong ACN for window size\nFor security measures connection is closed.");
+                cout << "[Client] Server responded with wrong ACN for window size\nFor security measures connection is closed.\n";
+                logger->error("[Client] Server responded with wrong ACN for window size");
                 cout << rang::style::reset;
             }
         } else {
             cout << rang::fg::red;
-            cout << "[Client] Connection was not closed as intended:\n" << ec.message();
+            cout << "[Client] Could not connect to Server: \n" << ec.message();
+            logger->error("[Client] Client could not connect to the server: {0}", ec.message());
             cout << rang::style::reset;
         }
 
-    } else {
+    } else if (a) {
         cout << rang::fg::magenta << "\n\nAllowed characters are:\n\n" << rang::style::reset;
         Table ascii_table;
         ascii_table.format().corner_color(Color::magenta).border_color(Color::magenta)
@@ -165,5 +174,9 @@ int main(int argc, char* argv[]) {
             cnt++;
         }
         cout << ascii_table << "\n";
+    } else if(l) {
+        cout << rang::fg::magenta << "\n" << logPath << "\n" << rang::style::reset;
+    } else {
+        logger->error("Something very strange happened");
     }
 }
