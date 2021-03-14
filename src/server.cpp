@@ -33,13 +33,14 @@ int main() {
     asio::ip::tcp::socket socket(context);
     server_acceptor.accept(socket); //wait for input
 
-    string number_of_sended_frames;
+    string number_of_sended_frames_tmp;
+    string window_size_tmp;
     while(true) {
       server_acceptor.listen(1);
       //gets size if windows
       try {
-          string window_size = server.receive_data(socket);
-          window_size.pop_back();
+          window_size_tmp = server.receive_data(socket);
+          window_size_tmp.pop_back();
           server.send_data(socket, "[SERVER]WS_ACN");
       } catch (std::system_error const& ex) {
           cout << "[SERVER] Window size not valid\n"; //later logging here
@@ -48,16 +49,20 @@ int main() {
       
       //gets maximum of sent frames
       try {
-          number_of_sended_frames = server.receive_data(socket);
-          number_of_sended_frames.pop_back();
+          number_of_sended_frames_tmp = server.receive_data(socket);
+          number_of_sended_frames_tmp.pop_back();
           server.send_data(socket, "[SERVER]F_ACN");
       } catch (std::system_error const& ex) {
           cout << "[SERVER] Number of receiving frames not valid\n"; //later logging here
           break;
       }
 
+      int window_size = stoi(window_size_tmp);
+      int number_of_sended_frames = stoi(number_of_sended_frames_tmp);
+
+      int window_cnt = 1;
       int cnt = 0;
-      while (cnt < std::stoi(number_of_sended_frames)) {
+      while (cnt < number_of_sended_frames) {
         try {
           string res = server.receive_data(socket);
           res.pop_back();
@@ -67,8 +72,12 @@ int main() {
             break;
           }
 
-          cout << "[Server] " << res << "\n";
-          server.send_data(socket, res);
+          ++window_cnt;
+          if (window_cnt == window_size) {
+            cout << "[Server] All frames received\n";
+            server.send_data(socket, res);
+            window_cnt = 1;
+          }
         } catch (std::system_error const& ex) {
           //should be raised after last char receiving
           break;

@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
     app.add_option("input_characters", input_chars,
          "Given characters will be random times send to server    Example: \"./connectsim asdf\"");
     app.add_option("-w,--windowsize", window_size,
-         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"");
+         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::Number);
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
     app.add_flag("-e,--exit", a , "Disconnects client and shutsdown server");
 
@@ -115,13 +115,21 @@ int main(int argc, char* argv[]) {
                 response.pop_back();
 
                 if (response == "[SERVER]F_ACN") { //check if frames count acn
+                    int w_cnt = 1; //window size counter
                     for (size_t i=0; i < ascii_vec.size(); ++i) {
                         //tmp = "";
                         //tmp.push_back(ascii_vec.at(i));
                         //send_data(socket, tmp);
                         send_data(socket, to_string(ascii_vec.at(i)));
-                        response = receive_data(socket);
-                        cout << "[Client] " << response;
+                        ++w_cnt;
+                        if (w_cnt == stoi(window_size)) {
+                            response = receive_data(socket);
+                            //if (response != to_string(ascii_vec.at(i))) {
+                                //throw std::invalid_argument("[Client] Server responded with wrong checksum.");
+                            //}
+                            cout << "[Client] ACN from Server correct\n";
+                            w_cnt = 1;
+                        }
                     }
                     socket.close(ec);
                     cout << "[Client] Disconnected!\n";
