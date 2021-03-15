@@ -9,8 +9,12 @@ This will redirect you to a detailed view, which each commit changed in the proj
 ** [Unreleased] - 15.03.2021
 *** Commit-Tickets
 /2095152be03482df2ee39cf18918ae6ca7a99870
+/9d7a248a563761c8fddcf52e4e7a1d7ed5467a17
+/bd4530438d105c44a3eecd6f69b46f0c96f5f01a
 *** Added
 -basic sliding window technique implemented
+-more logging Added
+-changelog format update
 
 ** [Unreleased] - 08.03.2021
 *** Commit-Tickets
