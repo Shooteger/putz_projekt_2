@@ -10,7 +10,7 @@
 #define ASIO_STANDALONE
 #include <asio.hpp>
 #include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/async.h"
+//#include "spdlog/async.h"
 #include "rang.hpp"
 
 //ignore warning "-Wnon-virtual-dtor" from extern library "tabulate"
@@ -27,7 +27,8 @@ using namespace tabulate;
 //create logger for file
 string home = getenv("HOME");
 string logPath = home;
-auto logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logPath.append("/Desktop/connectsim/log.txt"));
+//auto logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logPath.append("/Desktop/connectsim/log.txt"));
+auto logger = spdlog::basic_logger_mt("basic_logger", "logs/log.txt");
 
 //returns vector of ascii character
 vector<char> create_random_ascii(string allowed_ascii_signs="") {
@@ -93,6 +94,7 @@ int main(int argc, char* argv[]) {
     }
     cout << rang::style::reset;
 
+    //logger->info("test");
     //system("./server");
     //cout << "[Program] Server started\n";
 
@@ -122,6 +124,7 @@ int main(int argc, char* argv[]) {
                 if (response == "[SERVER]F_ACN") { //check if frames count acn
                     //logger->info("[Client] Data count->Server-ACN");
                     int w_cnt = 1; //window size counter
+                    cout << ascii_vec.size();
                     for (size_t i=0; i < ascii_vec.size(); ++i) {
                         //tmp = "";
                         //tmp.push_back(ascii_vec.at(i));
