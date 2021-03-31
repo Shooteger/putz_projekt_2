@@ -10,7 +10,7 @@
 #define ASIO_STANDALONE
 #include <asio.hpp>
 #include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/async.h"
+//#include "spdlog/async.h"
 #include "rang.hpp"
 
 //ignore warning "-Wnon-virtual-dtor" from extern library "tabulate"
@@ -131,6 +131,7 @@ int main(int argc, char* argv[]) {
                 if (response == "[SERVER]F_ACN") { //check if frames count acn
                     //logger->info("[Client] Data count->Server-ACN");
                     int w_cnt = 1; //window size counter
+                    cout << ascii_vec.size();
                     for (size_t i=0; i < ascii_vec.size(); ++i) {
                         //tmp = "";
                         //tmp.push_back(ascii_vec.at(i));
