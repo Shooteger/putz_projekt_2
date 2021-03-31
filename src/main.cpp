@@ -24,11 +24,6 @@
 using namespace std;
 using namespace tabulate;
 
-//create logger for file
-string home = getenv("HOME");
-string logPath = home;
-auto logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logPath.append("/Desktop/connectsim/log.txt"));
-
 //returns vector of ascii character
 vector<char> create_random_ascii(string allowed_ascii_signs="") {
     vector<char> res;
@@ -67,18 +62,30 @@ void send_data(asio::ip::tcp::socket& socket, const string message) {
   write(socket, asio::buffer(message + "\n"));
 }
 
-
 int main(int argc, char* argv[]) {
+    //create logger for file
+    //string home = getenv("HOME");
+    //string logPath = home;
+    //auto logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logPath.append("/Desktop/connectsim/log.txt"));
+
     string input_chars;
     string window_size = "3";
+    string logpath_str = "connectsim_log.txt";
+    
+    std::shared_ptr<spdlog::logger> logger;
+
     bool a = false;
     bool l = false;
+
+    //setting logger path
     
     CLI::App app {"Networking Simulator"};
     app.add_option("input_characters", input_chars,
          "Given characters will be random times send to server    Example: \"./connectsim asdf\"");
     app.add_option("-w,--windowsize", window_size,
-         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::Number);
+         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::PositiveNumber);
+    app.add_option("-s,--set_logpath", logpath_str,
+         "Given Path will set new Path for saving logfile    Example: \"./connectsim -s /home/user/Desktop/");
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
     app.add_flag("-l,--logpath", l , "Returns path of logfile with details on console");
 
@@ -88,13 +95,15 @@ int main(int argc, char* argv[]) {
         CLI11_PARSE(app, argc, argv);
     } catch(const CLI::ParseError &e) {
         cout << rang::fg::red;
-        logger->error("Program terminated because of parse exception: {0}", e.what());
         return app.exit(e);
     }
     cout << rang::style::reset;
 
-    //system("./server");
-    //cout << "[Program] Server started\n";
+    try {
+        logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logpath_str);
+    } catch (const spdlog::spdlog_ex &ex) {
+        cout << "Initializing logpath failed.\nTry to change the path where the file should be saved to and try again.\nCommand with \"./connectsim -h\"\n";
+    }
 
     if (!a && !l) {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
@@ -175,8 +184,13 @@ int main(int argc, char* argv[]) {
         }
         cout << ascii_table << "\n";
     } else if(l) {
-        cout << rang::fg::magenta << "\n" << logPath << "\n" << rang::style::reset;
+        auto tmp_l_path = system("readlink -f connectsim_log.txt");
+        cout << rang::fg::magenta << "\n" << tmp_l_path << "\n" << rang::style::reset;
     } else {
-        logger->error("Something very strange happened");
+        try {
+            logger->error("Something very strange happened");
+        } catch(...) {
+            cout << "Could never happen\n";
+        }
     }
 }

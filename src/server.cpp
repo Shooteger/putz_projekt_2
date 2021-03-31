@@ -31,12 +31,12 @@ int main() {
   if (!ec) {
     cout << "[Server] Client connected\n";
     asio::ip::tcp::socket socket(context);
-    server_acceptor.accept(socket); //wait for input
+    
 
     string number_of_sended_frames_tmp;
     string window_size_tmp;
     while(true) {
-      server_acceptor.listen(1);
+      server_acceptor.accept(socket); //wait for input
       //gets size if windows
       try {
           window_size_tmp = server.receive_data(socket);
