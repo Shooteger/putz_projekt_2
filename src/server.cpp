@@ -28,10 +28,15 @@ int main() {
   asio::error_code ec;
   asio::ip::tcp::acceptor server_acceptor(context, 
                                           asio::ip::tcp::endpoint(asio::ip::make_address("127.0.0.1", ec), 9999));
+
+
   if (!ec) {
     cout << "[Server] Client connected\n";
     asio::ip::tcp::socket socket(context);
     
+    //server_acceptor.set_option((asio::ip::tcp::acceptor::reuse_address(true)));
+
+    //server_acceptor.listen(); //wait for input
 
     string number_of_sended_frames_tmp;
     string window_size_tmp;
@@ -84,13 +89,10 @@ int main() {
         }
         cnt++;
       }
-
-      server_acceptor.cancel(); //end client connection
       break;
     }
   } else {
     cout << "Connection failed to server with address:\n" << ec.message() << "\n";
   }
-
-  return 0;
+  
 }

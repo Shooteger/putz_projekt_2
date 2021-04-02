@@ -10,7 +10,6 @@
 #define ASIO_STANDALONE
 #include <asio.hpp>
 #include "spdlog/sinks/basic_file_sink.h"
-//#include "spdlog/async.h"
 #include "rang.hpp"
 
 //ignore warning "-Wnon-virtual-dtor" from extern library "tabulate"
@@ -100,7 +99,7 @@ int main(int argc, char* argv[]) {
     cout << rang::style::reset;
 
     try {
-        logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logpath_str);
+        logger = spdlog::basic_logger_mt("basic_logger", logpath_str);
     } catch (const spdlog::spdlog_ex &ex) {
         cout << "Initializing logpath failed.\nTry to change the path where the file should be saved to and try again.\nCommand with \"./connectsim -h\"\n";
     }
@@ -120,22 +119,18 @@ int main(int argc, char* argv[]) {
             send_data(socket, window_size);
             response = receive_data(socket);
             response.pop_back();    //here is stucked an hour, freaking \n remove!!!
-            //cout << window_size << "; \n";
 
             if (response == "[SERVER]WS_ACN") { //check if window size acn
                 
                 send_data(socket, to_string(ascii_vec.size()));
                 response = receive_data(socket);
                 response.pop_back();
-                //logger->info("[Client] Sliding Window Size->Server-ACN");
+
                 if (response == "[SERVER]F_ACN") { //check if frames count acn
-                    //logger->info("[Client] Data count->Server-ACN");
                     int w_cnt = 1; //window size counter
                     cout << ascii_vec.size();
                     for (size_t i=0; i < ascii_vec.size(); ++i) {
-                        //tmp = "";
-                        //tmp.push_back(ascii_vec.at(i));
-                        //send_data(socket, tmp);
+
                         send_data(socket, to_string(ascii_vec.at(i)));
                         ++w_cnt;
                         if (w_cnt == stoi(window_size)) {
