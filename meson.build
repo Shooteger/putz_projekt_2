@@ -25,8 +25,15 @@ executable('connectionsim',
             #link_with : XXX_lib
            )
 
+executable('server_test',
+            sources : ['src/server_old.cpp'],
+            include_directories : inc_dir,
+            dependencies : [thread_dep]
+            #link_with : XXX_lib
+           )
+
 executable('server',
-            sources : ['src/server.cpp'],
+            sources : ['src/server_new.cpp'],
             include_directories : inc_dir,
             dependencies : [thread_dep]
             #link_with : XXX_lib

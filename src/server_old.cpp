@@ -17,7 +17,7 @@ string Server::receive_data(asio::ip::tcp::socket& socket) {
 }
 
 void Server::send_data(asio::ip::tcp::socket& socket, const string message) {
-  write(socket, asio::buffer(message + "\n"));
+  asio::write(socket, asio::buffer(message + "\n"));
 }
 
 int main() {
@@ -80,6 +80,7 @@ int main() {
           ++window_cnt;
           if (window_cnt == window_size) {
             cout << "[Server] All frames received\n";
+            //cout << res << ";\n";
             server.send_data(socket, res);
             window_cnt = 1;
           }

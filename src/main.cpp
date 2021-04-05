@@ -27,7 +27,7 @@ using namespace tabulate;
 vector<char> create_random_ascii(string allowed_ascii_signs="") {
     vector<char> res;
     srand((int)time(0)); //starting point and time point of random seed
-	int repeat = rand() % 127  + 1;   //how often random ascii sign should be repeated
+	int repeat = rand() % 127  + 2;   //how often random ascii sign should be repeated
 
     if (allowed_ascii_signs == "") {
         int i = 0;
@@ -58,17 +58,12 @@ string receive_data(asio::ip::tcp::socket& socket) {
 }
 
 void send_data(asio::ip::tcp::socket& socket, const string message) {
-  write(socket, asio::buffer(message + "\n"));
+    asio::write(socket, asio::buffer(message + "\n"));
 }
 
 int main(int argc, char* argv[]) {
-    //create logger for file
-    //string home = getenv("HOME");
-    //string logPath = home;
-    //auto logger = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", logPath.append("/Desktop/connectsim/log.txt"));
-
     string input_chars;
-    string window_size = "3";
+    string window_size = "1";       //hier aufpassen!!!! window size muss kleiner als anzahl zufällig gewählter zu übertragenden zeichen sein
     string logpath_str = "connectsim_log.txt";
     
     std::shared_ptr<spdlog::logger> logger;
@@ -106,65 +101,84 @@ int main(int argc, char* argv[]) {
 
     if (!a && !l) {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
-        asio::error_code ec;
-        asio::io_context context;
-        asio::ip::tcp::socket socket(context);
-        socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1", ec), 9999));
+        size_t tmp_compare = stoi(window_size);
 
-        if (!ec) {
-            logger->info("[Client] Client connected to server");
-            string response;
-            string tmp;
-            
-            send_data(socket, window_size);
-            response = receive_data(socket);
-            response.pop_back();    //here is stucked an hour, freaking \n remove!!!
+        cout << ascii_vec.size() << " : " << tmp_compare << "\n";
+        if (ascii_vec.size() >= tmp_compare) {
 
-            if (response == "[SERVER]WS_ACN") { //check if window size acn
+            asio::error_code ec;
+            asio::io_context context;
+            asio::ip::tcp::socket socket(context);
+            socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1", ec), 9999));
+
+            if (!ec) {
+                logger->info("[Client] Client connected to server");
+                string response;
+                string tmp;
                 
-                send_data(socket, to_string(ascii_vec.size()));
+                send_data(socket, window_size);
                 response = receive_data(socket);
-                response.pop_back();
+                response.pop_back();    //here is stucked an hour, freaking \n remove!!!
 
-                if (response == "[SERVER]F_ACN") { //check if frames count acn
-                    int w_cnt = 1; //window size counter
-                    cout << ascii_vec.size();
-                    for (size_t i=0; i < ascii_vec.size(); ++i) {
+                if (response == "[SERVER]WS_ACN") { //check if window size acn
+                    
+                    send_data(socket, to_string(ascii_vec.size()));
+                    response = receive_data(socket);
+                    response.pop_back();
 
-                        send_data(socket, to_string(ascii_vec.at(i)));
-                        ++w_cnt;
-                        if (w_cnt == stoi(window_size)) {
-                            response = receive_data(socket);
-                            //if (response != to_string(ascii_vec.at(i))) {
-                                //throw std::invalid_argument("[Client] Server responded with wrong checksum.");
-                            //}
-                            cout << "[Client] ACN from Server correct\n";
-                            w_cnt = 1;
+                    if (response == "[SERVER]F_ACN") { //check if frames count acn
+                        int w_cnt = 0; //window size counter
+                        //cout << ascii_vec.size();
+                        //int tmp_loop_cnt = 0;
+                        for (size_t i=0; i < ascii_vec.size(); ++i) {
+                            
+                            //cout << "server loop1:" << tmp_loop_cnt << "\n";
+                            //cout << "zum test daten:" << to_string(ascii_vec.at(i)) << "\n";
+                            //tmp_loop_cnt++;
+
+                            send_data(socket, to_string(ascii_vec.at(i)));
+                            ++w_cnt;
+
+                            if (w_cnt == stoi(window_size)) {
+                                //cout << "server loop2 im if:" << tmp_loop_cnt << "\n";
+                                response = receive_data(socket);
+                                response.pop_back();
+                                //cout << "nach response" << "\n";
+                                //cout << to_string(ascii_vec.at(i)) << "\n";
+                                if (response != to_string(ascii_vec.at(i))) {
+                                    throw std::invalid_argument("[Client] Server responded with wrong checksum.");
+                                }
+                                cout << "[Client] ACN from Server correct\n";
+                                w_cnt = 0;
+                            }
                         }
+                        socket.close(ec);
+                        cout << "[Client] From server disconnected!\n";
+
+                    } else {
+                        socket.close();
+                        cout << rang::fg::red;
+                        cout << "[Client] Server responded with wrong ACN for number of data frames\nFor security measures connection is beeing closed.\n";
+                        logger->error("[Client] Server responded with wrong ACN for number of data frames");
+                        cout << rang::style::reset;
                     }
-                    socket.close(ec);
-                    cout << "[Client] Disconnected!\n";
                 } else {
                     socket.close();
                     cout << rang::fg::red;
-                    cout << "[Client] Server responded with wrong ACN for number of data frames\nFor security measures connection is beeing closed.\n";
-                    logger->error("[Client] Server responded with wrong ACN for number of data frames");
+                    cout << "[Client] Server responded with wrong ACN for window size\nFor security measures connection is closed.\n";
+                    logger->error("[Client] Server responded with wrong ACN for window size");
                     cout << rang::style::reset;
                 }
             } else {
-                socket.close();
                 cout << rang::fg::red;
-                cout << "[Client] Server responded with wrong ACN for window size\nFor security measures connection is closed.\n";
-                logger->error("[Client] Server responded with wrong ACN for window size");
+                cout << "[Client] Could not connect to Server: \n" << ec.message();
+                logger->error("[Client] Client could not connect to the server: {0}", ec.message());
                 cout << rang::style::reset;
             }
         } else {
-            cout << rang::fg::red;
-            cout << "[Client] Could not connect to Server: \n" << ec.message();
-            logger->error("[Client] Client could not connect to the server: {0}", ec.message());
-            cout << rang::style::reset;
+            cout << "[Client] Given window size is higher than count of random ASCII values which are to transfer.\n Window size must be lower or same count.";
+            cout << "Please try again with same parameters and repeat it until it is working,\nor try a minor value of the window size with \"-w\"-option!\n";
         }
-
     } else if (a) {
         cout << rang::fg::magenta << "\n\nAllowed characters are:\n\n" << rang::style::reset;
         Table ascii_table;
@@ -189,4 +203,5 @@ int main(int argc, char* argv[]) {
             cout << "Could never happen\n";
         }
     }
+    
 }
