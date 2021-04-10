@@ -1,5 +1,7 @@
 #include <iostream>
 #include <asio.hpp>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -12,6 +14,26 @@ string receive_data(asio::ip::tcp::socket& socket) {
 
 void send_data(asio::ip::tcp::socket& socket, const string message) {
     asio::write(socket, asio::buffer(message + "\n"));
+}
+
+
+int max_sum(vector<char> ascii_vec, int window_size, int size) {
+    if (size >= window_size) {
+        int max_sum = 0;
+        for (int i = 0; i < window_size; ++i) {
+            max_sum += (int)ascii_vec.at(i);
+        }
+        
+        int window_sum = max_sum;
+        for (int i = window_size; i < size; ++i) {
+            window_sum += (int)ascii_vec.at(i) - (int)ascii_vec.at(i - window_size);
+            max_sum = max(max_sum, window_sum);
+        }
+        
+        return max_sum;
+    } else {
+        return -1;
+    }
 }
 
 void process(asio::ip::tcp::socket socket) {
@@ -28,7 +50,6 @@ void process(asio::ip::tcp::socket socket) {
             cout << "[SERVER] Window size not valid\n"; //later logging here
         }
       
-        cout << window_size_tmp << "\n";
         //gets maximum of sent frames
         try {
             number_of_sended_frames_tmp = receive_data(socket);
@@ -38,38 +59,43 @@ void process(asio::ip::tcp::socket socket) {
             cout << "[SERVER] Number of receiving frames not valid\n"; //later logging here
         }
 
+        vector<char> res_vec;
+
         int window_size = stoi(window_size_tmp);
         int number_of_sended_frames = stoi(number_of_sended_frames_tmp);
 
         int window_cnt = 0;
         int cnt = 0;
-        //int tmp_cnt = 0;
+        int checksum_server = 0;
         while (cnt < number_of_sended_frames) {
-            //cout << "server loop:" << tmp_cnt << "\n";
-            //tmp_cnt++;
-
+            
             try {
                 string res = receive_data(socket);
                 res.pop_back();
                 ++window_cnt;
 
-                if (res == "exit") {
-                    cout << "[Server] Client disconneted\n";
-                    break;
-                }
-                //cout << "vor if ws\n";
-                if (window_cnt == window_size) {
-                    cout << "[Server] All frames received\n";
-                    send_data(socket, res);
-                    window_cnt = 0;
-                }
+                res_vec.push_back(static_cast<char>(stoi(res)));
 
+                checksum_server += stoi(res);
+
+                if (window_cnt == window_size) {
+                    cout << "[Server] All frames of window size received. Sending checksum...\n";
+                    send_data(socket, to_string(checksum_server));
+                    window_cnt = 0;
+                    checksum_server = 0;
+                } else {
+                    send_data(socket, res);
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
             } catch (std::system_error const& ex) {
-                //should be raised after last char receiving
                 break;
             }
             cnt++;
         }
+
+        int tmp_max = max_sum(res_vec, window_size, number_of_sended_frames);
+        send_data(socket, to_string(tmp_max));
+        cout << "tmp_max: " << tmp_max;
         socket.close();
         cout << "[Server] Client disconnected\n";
 }

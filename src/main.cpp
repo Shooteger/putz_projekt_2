@@ -18,8 +18,6 @@
 #include "tabulate.hpp"
 #pragma GCC diagnostic pop
 
-#include "server.h"
-
 using namespace std;
 using namespace tabulate;
 
@@ -61,6 +59,25 @@ void send_data(asio::ip::tcp::socket& socket, const string message) {
     asio::write(socket, asio::buffer(message + "\n"));
 }
 
+int max_sum(vector<char> ascii_vec, int window_size, int size) {
+    if (size >= window_size) {
+        int max_sum = 0;
+        for (int i = 0; i < window_size; ++i) {
+            max_sum += (int)ascii_vec.at(i);
+        }
+        
+        int window_sum = max_sum;
+        for (int i = window_size; i < size; ++i) {
+            window_sum += (int)ascii_vec.at(i) - (int)ascii_vec.at(i - window_size);
+            max_sum = max(max_sum, window_sum);
+        }
+        
+        return max_sum;
+    } else {
+        return -1;
+    }
+}
+
 int main(int argc, char* argv[]) {
     string input_chars;
     string window_size = "1";       //hier aufpassen!!!! window size muss kleiner als anzahl zufällig gewählter zu übertragenden zeichen sein
@@ -70,6 +87,9 @@ int main(int argc, char* argv[]) {
 
     bool a = false;
     bool l = false;
+    bool pl = false;
+    bool dm = false;
+    bool pr = false;
 
     //setting logger path
     
@@ -80,6 +100,9 @@ int main(int argc, char* argv[]) {
          "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::PositiveNumber);
     app.add_option("-s,--set_logpath", logpath_str,
          "Given Path will set new Path for saving logfile    Example: \"./connectsim -s /home/user/Desktop/");
+    app.add_flag("-p,--packageloss", pl , "Simulates Package loss while sending data to server and otherwise");
+    app.add_flag("-d,--datamanipulation", dm , "Simulates manipulation of some data packages.");
+    app.add_flag("-r,--packagerow", pr , "Simulates behaviour if sended data have wrong order.");
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
     app.add_flag("-l,--logpath", l , "Returns path of logfile with details on console");
 
@@ -103,7 +126,6 @@ int main(int argc, char* argv[]) {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
         size_t tmp_compare = stoi(window_size);
 
-        cout << ascii_vec.size() << " : " << tmp_compare << "\n";
         if (ascii_vec.size() >= tmp_compare) {
 
             asio::error_code ec;
@@ -128,29 +150,60 @@ int main(int argc, char* argv[]) {
 
                     if (response == "[SERVER]F_ACN") { //check if frames count acn
                         int w_cnt = 0; //window size counter
-                        //cout << ascii_vec.size();
-                        //int tmp_loop_cnt = 0;
+
+                        int checksum = 0;
+                        //int int_buffer;
+
+                        if (pl || dm || pr) {
+                            int package_loss_sim = rand() % stoi(window_size) + 1;
+                            cout << package_loss_sim;
+                        }
+
+                        int max_checksum = max_sum(ascii_vec, stoi(window_size), (int)ascii_vec.size());
+                        
+                        cout << (int)ascii_vec.size() << "\n";
+
                         for (size_t i=0; i < ascii_vec.size(); ++i) {
-                            
-                            //cout << "server loop1:" << tmp_loop_cnt << "\n";
-                            //cout << "zum test daten:" << to_string(ascii_vec.at(i)) << "\n";
-                            //tmp_loop_cnt++;
+                            //cout << (int)ascii_vec.at(i) << "\n";
+
+                            checksum += (int)ascii_vec.at(i);
 
                             send_data(socket, to_string(ascii_vec.at(i)));
                             ++w_cnt;
 
+                            
+                            //should enter after sending maximum window size
                             if (w_cnt == stoi(window_size)) {
-                                //cout << "server loop2 im if:" << tmp_loop_cnt << "\n";
+
+                                //cout << "Checksum: " << checksum << "\n";
+
                                 response = receive_data(socket);
                                 response.pop_back();
-                                //cout << "nach response" << "\n";
-                                //cout << to_string(ascii_vec.at(i)) << "\n";
-                                if (response != to_string(ascii_vec.at(i))) {
+
+                                if (stoi(response) != checksum) {
                                     throw std::invalid_argument("[Client] Server responded with wrong checksum.");
+                                    break;
                                 }
-                                cout << "[Client] ACN from Server correct\n";
+                                cout << "[Client] Checksum response from Server correct\n";
                                 w_cnt = 0;
-                            }
+                                checksum = 0;
+                            } else {
+                                response = receive_data(socket);
+                                response.pop_back();
+
+                                if (response != to_string(ascii_vec.at(i))) {
+                                    throw std::invalid_argument("[Client] Server responded with wrong ACN.");
+                                    break;
+                                }   
+                            }                         
+                        }
+                        response = receive_data(socket);
+                        response.pop_back();
+
+                        cout << "response: " << response << "; max: " << max_checksum << "\n";
+
+                        if (max_checksum != stoi(response)) {
+                            //throw std::invalid_argument("[Client] Server responded with wrong maximum checksum at end.");
                         }
                         socket.close(ec);
                         cout << "[Client] From server disconnected!\n";
