@@ -75,6 +75,10 @@ void process(asio::ip::tcp::socket socket) {
                 res.pop_back();
                 ++window_cnt;
 
+                if (stoi(res) == 0) {
+                    break;
+                }
+
                 res_vec.push_back(static_cast<char>(stoi(res)));
 
                 checksum_server += stoi(res);
@@ -102,11 +106,12 @@ void process(asio::ip::tcp::socket socket) {
 
         if ((int)res_vec.size() == number_of_sended_frames) {
             int tmp_max = max_sum(res_vec, window_size, number_of_sended_frames);
+            //cout << "test: " << tmp_max;
             send_data(socket, to_string(tmp_max));
         } else {
-            send_data(socket, "[Server] Received package count does not match with received count of data packages to process");
+            send_data(socket, "[Server] Received package count does not match with received count of data packages to process.\nPlease look into log files.");
         }
-        
+        std::this_thread::sleep_for(std::chrono::milliseconds(80));
         socket.close();
         cout << "[Server] Client disconnected\n";
 }

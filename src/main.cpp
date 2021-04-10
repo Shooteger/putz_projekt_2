@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
     bool dm = false;
     bool pr = false;
 
+    bool pl_send = false;
     //setting logger path
     
     CLI::App app {"Networking Simulator"};
@@ -150,20 +151,10 @@ int main(int argc, char* argv[]) {
 
                     if (response == "[SERVER]F_ACN") { //check if frames count acn
                         int w_cnt = 0; //window size counter
-
                         int checksum = 0;
-
-                        if (pl || dm || pr) {
-                           cout << "test\n";
-                        }
-
                         int max_checksum = max_sum(ascii_vec, stoi(window_size), (int)ascii_vec.size());
                         
-                        cout << (int)ascii_vec.size() << "\n";
-
                         for (size_t i=0; i < ascii_vec.size(); ++i) {
-                            //cout << (int)ascii_vec.at(i) << "\n";
-
                             checksum += (int)ascii_vec.at(i);
 
                             send_data(socket, to_string(ascii_vec.at(i)));
@@ -172,6 +163,7 @@ int main(int argc, char* argv[]) {
                             if (pl) {
                                 ++i;
                                 pl = false;
+                                pl_send = true;
                             }
 
                             //should enter after sending maximum window size
@@ -188,6 +180,7 @@ int main(int argc, char* argv[]) {
                                     logger->info("[Client] Server responded with wrong checksum");
                                 } else {
                                     cout << "[Client] Checksum response from Server correct\n";
+                                    logger->info("[Client] Checksum response from Server correct");
                                 }
                                 
                                 w_cnt = 0;
@@ -198,26 +191,28 @@ int main(int argc, char* argv[]) {
 
                                 if (response != to_string(ascii_vec.at(i))) {
                                     logger->info("[Client] Server responded with wrong ACN");
-                                    //throw std::invalid_argument("[Client] Server responded with wrong ACN.");
-                                    //cout << i << "\n";
-                                    ++i;
                                 }
                             }
                         }
-                        send_data(socket, "0"); //sending 0 if -p paremeter is true, because server awaits full length of frames, which count is sended before
-                                                //without this, there would be an endless loop, server waits for one last character which will never be send
+                        
+                        if (pl_send)
+                            send_data(socket, "0"); //sending 0 if -p paremeter is true, because server awaits full length of frames, which count is sended before
+                                                    //without this, there would be an endless loop, server waits for one last character which will never be send
 
-                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                        //std::this_thread::sleep_for(std::chrono::milliseconds(550));
+
                         response = receive_data(socket);
                         response.pop_back();
 
-                        //cout << "response: " << response << "; max: " << max_checksum << "\n";
-
-                        if (max_checksum != stoi(response)) {
-                            //throw std::invalid_argument("[Client] Server responded with wrong maximum checksum at end.");
-                            cout << "[Client] Server with wrong max sum: " << response << "\n";
-                            //throw std::invalid_argument("[Client] Server responded with wrong maximum checksum at end.");
+                        try {
+                            if (max_checksum != stoi(response)) {
+                                cout << "[Client] Server responded with wrong max sum: " << response << "\n";
+                            }
+                            cout << "[Client] Server responded with right max sum: " << response << "\n";
+                        } catch (std::invalid_argument const& ex) {
+                            cout << response << "\n";
                         }
+                        
                         socket.close(ec);
                         cout << "[Client] From server disconnected!\n";
 
