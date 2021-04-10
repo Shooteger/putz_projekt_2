@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
     bool pr = false;
 
     bool pl_send = false;
-    //setting logger path
+    //bool dm_send = false;
     
     CLI::App app {"Networking Simulator"};
     app.add_option("input_characters", input_chars,
@@ -155,9 +155,15 @@ int main(int argc, char* argv[]) {
                         int max_checksum = max_sum(ascii_vec, stoi(window_size), (int)ascii_vec.size());
                         
                         for (size_t i=0; i < ascii_vec.size(); ++i) {
+
                             checksum += (int)ascii_vec.at(i);
 
-                            send_data(socket, to_string(ascii_vec.at(i)));
+                            if (dm) {
+                                char tmp = static_cast<char>((rand() % (126-33)) + 33);
+                                send_data(socket, to_string(tmp));
+                            } else {
+                                send_data(socket, to_string(ascii_vec.at(i)));
+                            }
                             ++w_cnt;
 
                             if (pl) {
@@ -207,8 +213,9 @@ int main(int argc, char* argv[]) {
                         try {
                             if (max_checksum != stoi(response)) {
                                 cout << "[Client] Server responded with wrong max sum: " << response << "\n";
+                            } else {
+                                cout << "[Client] Server responded with right max sum: " << response << "\n";
                             }
-                            cout << "[Client] Server responded with right max sum: " << response << "\n";
                         } catch (std::invalid_argument const& ex) {
                             cout << response << "\n";
                         }
