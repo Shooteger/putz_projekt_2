@@ -31,15 +31,3 @@ executable('server',
             dependencies : [thread_dep]
             #link_with : XXX_lib
            )
-
-# doctest_dir = include_directories([get_option('doctest_include_dir')])
-
-# test_src = ['tests/test1.cpp',
-#             'src/stack.cpp']
-
-# test_exe = executable('test1',
-#                       sources : test_src,
-#                       include_directories : [inc_dir, doctest_dir],
-#                       dependencies : lib_fmt)
-
-# test('test1', test_exe)
