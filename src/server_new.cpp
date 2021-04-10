@@ -67,6 +67,7 @@ void process(asio::ip::tcp::socket socket) {
         int window_cnt = 0;
         int cnt = 0;
         int checksum_server = 0;
+        auto start_time = std::chrono::high_resolution_clock::now();
         while (cnt < number_of_sended_frames) {
             
             try {
@@ -91,11 +92,21 @@ void process(asio::ip::tcp::socket socket) {
                 break;
             }
             cnt++;
+            auto current_time = std::chrono::high_resolution_clock::now();
+            if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 5) {
+                send_data(socket, "[Server] Waiting time exceeded");
+                break;
+            }
         }
 
-        int tmp_max = max_sum(res_vec, window_size, number_of_sended_frames);
-        send_data(socket, to_string(tmp_max));
-        cout << "tmp_max: " << tmp_max;
+
+        if ((int)res_vec.size() == number_of_sended_frames) {
+            int tmp_max = max_sum(res_vec, window_size, number_of_sended_frames);
+            send_data(socket, to_string(tmp_max));
+        } else {
+            send_data(socket, "[Server] Received package count does not match with received count of data packages to process");
+        }
+        
         socket.close();
         cout << "[Server] Client disconnected\n";
 }

@@ -152,11 +152,9 @@ int main(int argc, char* argv[]) {
                         int w_cnt = 0; //window size counter
 
                         int checksum = 0;
-                        //int int_buffer;
 
                         if (pl || dm || pr) {
-                            int package_loss_sim = rand() % stoi(window_size) + 1;
-                            cout << package_loss_sim;
+                           cout << "test\n";
                         }
 
                         int max_checksum = max_sum(ascii_vec, stoi(window_size), (int)ascii_vec.size());
@@ -171,7 +169,11 @@ int main(int argc, char* argv[]) {
                             send_data(socket, to_string(ascii_vec.at(i)));
                             ++w_cnt;
 
-                            
+                            if (pl) {
+                                ++i;
+                                pl = false;
+                            }
+
                             //should enter after sending maximum window size
                             if (w_cnt == stoi(window_size)) {
 
@@ -181,10 +183,13 @@ int main(int argc, char* argv[]) {
                                 response.pop_back();
 
                                 if (stoi(response) != checksum) {
-                                    throw std::invalid_argument("[Client] Server responded with wrong checksum.");
-                                    break;
+                                    //throw std::invalid_argument("[Client] Server responded with wrong checksum.");
+                                    //break;
+                                    logger->info("[Client] Server responded with wrong checksum");
+                                } else {
+                                    cout << "[Client] Checksum response from Server correct\n";
                                 }
-                                cout << "[Client] Checksum response from Server correct\n";
+                                
                                 w_cnt = 0;
                                 checksum = 0;
                             } else {
@@ -192,17 +197,25 @@ int main(int argc, char* argv[]) {
                                 response.pop_back();
 
                                 if (response != to_string(ascii_vec.at(i))) {
-                                    throw std::invalid_argument("[Client] Server responded with wrong ACN.");
-                                    break;
-                                }   
-                            }                         
+                                    logger->info("[Client] Server responded with wrong ACN");
+                                    //throw std::invalid_argument("[Client] Server responded with wrong ACN.");
+                                    //cout << i << "\n";
+                                    ++i;
+                                }
+                            }
                         }
+                        send_data(socket, "0"); //sending 0 if -p paremeter is true, because server awaits full length of frames, which count is sended before
+                                                //without this, there would be an endless loop, server waits for one last character which will never be send
+
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
                         response = receive_data(socket);
                         response.pop_back();
 
-                        cout << "response: " << response << "; max: " << max_checksum << "\n";
+                        //cout << "response: " << response << "; max: " << max_checksum << "\n";
 
                         if (max_checksum != stoi(response)) {
+                            //throw std::invalid_argument("[Client] Server responded with wrong maximum checksum at end.");
+                            cout << "[Client] Server with wrong max sum: " << response << "\n";
                             //throw std::invalid_argument("[Client] Server responded with wrong maximum checksum at end.");
                         }
                         socket.close(ec);
