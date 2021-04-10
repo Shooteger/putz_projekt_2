@@ -11,6 +11,7 @@
 #include <asio.hpp>
 #include "spdlog/sinks/basic_file_sink.h"
 #include "rang.hpp"
+#include <nlohmann/json.hpp>
 
 //ignore warning "-Wnon-virtual-dtor" from extern library "tabulate"
 #pragma GCC diagnostic push
@@ -20,6 +21,7 @@
 
 using namespace std;
 using namespace tabulate;
+using json = nlohmann::json;
 
 //returns vector of ascii character
 vector<char> create_random_ascii(string allowed_ascii_signs="") {
@@ -81,7 +83,16 @@ int max_sum(vector<char> ascii_vec, int window_size, int size) {
 int main(int argc, char* argv[]) {
     string input_chars;
     string window_size = "1";       //hier aufpassen!!!! window size muss kleiner als anzahl zufällig gewählter zu übertragenden zeichen sein
-    string logpath_str = "connectsim_log.txt";
+    string logpath_new = "";
+
+    std::ifstream i("settings.json");
+    json json_obj;
+
+    i >> json_obj;
+
+    //cout << json_obj["logpath"];
+
+    string logpath_str = json_obj["logpath"];
     
     std::shared_ptr<spdlog::logger> logger;
 
@@ -92,15 +103,15 @@ int main(int argc, char* argv[]) {
     bool pr = false;
 
     bool pl_send = false;
-    //bool dm_send = false;
+    bool pr_after = false;
     
     CLI::App app {"Networking Simulator"};
     app.add_option("input_characters", input_chars,
          "Given characters will be random times send to server    Example: \"./connectsim asdf\"");
     app.add_option("-w,--windowsize", window_size,
          "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::PositiveNumber);
-    app.add_option("-s,--set_logpath", logpath_str,
-         "Given Path will set new Path for saving logfile    Example: \"./connectsim -s /home/user/Desktop/");
+    app.add_option("-s,--set_logpath", logpath_new,
+         "Change name of logfile or local path    Example: \"./connectsim -s logging/log_cs.txt");
     app.add_flag("-p,--packageloss", pl , "Simulates Package loss while sending data to server and otherwise");
     app.add_flag("-d,--datamanipulation", dm , "Simulates manipulation of some data packages.");
     app.add_flag("-r,--packagerow", pr , "Simulates behaviour if sended data have wrong order.");
@@ -122,8 +133,9 @@ int main(int argc, char* argv[]) {
     } catch (const spdlog::spdlog_ex &ex) {
         cout << "Initializing logpath failed.\nTry to change the path where the file should be saved to and try again.\nCommand with \"./connectsim -h\"\n";
     }
+    
 
-    if (!a && !l) {
+    if (!a && !l && logpath_new == "") {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
         size_t tmp_compare = stoi(window_size);
 
@@ -153,17 +165,35 @@ int main(int argc, char* argv[]) {
                         int w_cnt = 0; //window size counter
                         int checksum = 0;
                         int max_checksum = max_sum(ascii_vec, stoi(window_size), (int)ascii_vec.size());
-                        
+
+                        int change_row = 1;  //initialise with one, because otherwise if would be triggered 
+                        int random_count = rand() % (int)ascii_vec.size() + 1;
+
                         for (size_t i=0; i < ascii_vec.size(); ++i) {
 
                             checksum += (int)ascii_vec.at(i);
 
+                            if (change_row == (int)i && pr_after == true) {
+                                send_data(socket, to_string(ascii_vec.at((int)i-random_count)));
+                            }
+
                             if (dm) {
-                                char tmp = static_cast<char>((rand() % (126-33)) + 33);
-                                send_data(socket, to_string(tmp));
+                                if (int(i) <= 2) {
+                                    char tmp = static_cast<char>((rand() % (126-33)) + 33);
+                                    send_data(socket, to_string(tmp));
+                                } else {
+                                    dm = false;
+                                }
+                            } else if (pr) {
+                                random_count -= (int)i;
+                                change_row = i+random_count;
+                                send_data(socket, to_string(ascii_vec.at(change_row)));
+                                pr = false;
+                                pr_after = true;
                             } else {
                                 send_data(socket, to_string(ascii_vec.at(i)));
                             }
+
                             ++w_cnt;
 
                             if (pl) {
@@ -171,6 +201,7 @@ int main(int argc, char* argv[]) {
                                 pl = false;
                                 pl_send = true;
                             }
+
 
                             //should enter after sending maximum window size
                             if (w_cnt == stoi(window_size)) {
@@ -262,8 +293,13 @@ int main(int argc, char* argv[]) {
         }
         cout << ascii_table << "\n";
     } else if(l) {
-        auto tmp_l_path = system("readlink -f connectsim_log.txt");
+        string command = "readlink -f " + logpath_str;
+        auto tmp_l_path = system(command.c_str());
         cout << rang::fg::magenta << "\n" << tmp_l_path << "\n" << rang::style::reset;
+    } else if (logpath_new != "") {
+        json_obj["logpath"] = logpath_new;
+        std::ofstream o("settings.json");
+        o << std::setw(4) << json_obj << endl;
     } else {
         try {
             logger->error("Something very strange happened");
