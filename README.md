@@ -26,4 +26,4 @@ Das Programm gibt diesen Vorgang in einer Logdatei für den Server, und einer Lo
 Es gibt noch einige weitere Funktionen, wie auch die Simulation von Netzwerkfehlern.
 
 Eine genaue Anleitung und detailliertere Beschreibung findet man im _documents_-Ordner unter
-connectsim_ausarbeitung_putz.pdf".
+"connectsim_ausarbeitung_putz.pdf".
