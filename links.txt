@@ -2,3 +2,6 @@ Links used for research:
 https://www.boost.org/doc/libs/1_63_0/doc/html/boost_asio/examples.html
 https://www.codeproject.com/Articles/1264257/Socket-Programming-in-Cplusplus-using-boost-asio-T
 https://stackoverflow.com/questions/121162/what-does-the-explicit-keyword-mean
+
+Wanted to use libraries:
+github.com/erikzenker/inotify-cpp

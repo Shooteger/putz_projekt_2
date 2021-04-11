@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
 
 #include <CLI11.hpp>
 #define ASIO_STANDALONE
@@ -49,18 +50,20 @@ vector<char> create_random_ascii(string allowed_ascii_signs="") {
     return res;
 }
 
+//reveives data of given socket and returns a string
 string receive_data(asio::ip::tcp::socket& socket) {
-  //only temporarily, here the sliding window algorithm will take place;
   asio::streambuf sbf;
   asio::read_until(socket, sbf, "\n");
   string data = asio::buffer_cast<const char*>(sbf.data());
   return data;
 }
 
+//sends data to given socket
 void send_data(asio::ip::tcp::socket& socket, const string message) {
     asio::write(socket, asio::buffer(message + "\n"));
 }
 
+//calculates max size if every window and returns max size of given vector elements
 int max_sum(vector<char> ascii_vec, int window_size, int size) {
     if (size >= window_size) {
         int max_sum = 0;
@@ -82,20 +85,17 @@ int max_sum(vector<char> ascii_vec, int window_size, int size) {
 
 int main(int argc, char* argv[]) {
     string input_chars;
-    string window_size = "1";       //hier aufpassen!!!! window size muss kleiner als anzahl zufällig gewählter zu übertragenden zeichen sein
+    string window_size = "1";   //attention with this!!!! window size must be less than count of elements of vector with chars to be send
     string logpath_new = "";
 
+    //open json file and load into logpath for logger
     std::ifstream i("settings.json");
     json json_obj;
-
     i >> json_obj;
-
-    //cout << json_obj["logpath"];
-
     string logpath_str = json_obj["logpath"];
-    
     std::shared_ptr<spdlog::logger> logger;
 
+    //CLI parameter
     bool a = false;
     bool l = false;
     bool pl = false;
@@ -111,14 +111,13 @@ int main(int argc, char* argv[]) {
     app.add_option("-w,--windowsize", window_size,
          "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::PositiveNumber);
     app.add_option("-s,--set_logpath", logpath_new,
-         "Change name of logfile or local path    Example: \"./connectsim -s logging/log_cs.txt");
+         "Change name of logfile or local path for client    Example: \"./connectsim -s logging/log_cs.txt");
     app.add_flag("-p,--packageloss", pl , "Simulates Package loss while sending data to server and otherwise");
     app.add_flag("-d,--datamanipulation", dm , "Simulates manipulation of some data packages.");
     app.add_flag("-r,--packagerow", pr , "Simulates behaviour if sended data have wrong order.");
     app.add_flag("-a,--allowed", a , "Show allowed character for input");
     app.add_flag("-l,--logpath", l , "Returns path of logfile with details on console");
 
-    //NOTE ADD WHICH ASCII CHARACTERS ARE ALLOWED! 33 until 129 in dec!
     cout << rang::fg::cyan;
     try {
         CLI11_PARSE(app, argc, argv);
@@ -134,7 +133,6 @@ int main(int argc, char* argv[]) {
         cout << "Initializing logpath failed.\nTry to change the path where the file should be saved to and try again.\nCommand with \"./connectsim -h\"\n";
     }
     
-
     if (!a && !l && logpath_new == "") {
         const vector<char> ascii_vec = create_random_ascii(input_chars);
         size_t tmp_compare = stoi(window_size);
@@ -147,7 +145,7 @@ int main(int argc, char* argv[]) {
             socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1", ec), 9999));
 
             if (!ec) {
-                logger->info("[Client] Client connected to server");
+                logger->info("[CLIENT] CLIENT connected to server");
                 string response;
                 string tmp;
                 
@@ -181,6 +179,7 @@ int main(int argc, char* argv[]) {
                                 if (int(i) <= 2) {
                                     char tmp = static_cast<char>((rand() % (126-33)) + 33);
                                     send_data(socket, to_string(tmp));
+                                    logger->info("[CLIENT] Sending manipulated data");
                                 } else {
                                     dm = false;
                                 }
@@ -190,6 +189,7 @@ int main(int argc, char* argv[]) {
                                 send_data(socket, to_string(ascii_vec.at(change_row)));
                                 pr = false;
                                 pr_after = true;
+                                logger->info("[CLIENT] Sending data in wrong order");
                             } else {
                                 send_data(socket, to_string(ascii_vec.at(i)));
                             }
@@ -200,24 +200,22 @@ int main(int argc, char* argv[]) {
                                 ++i;
                                 pl = false;
                                 pl_send = true;
+                                logger->info("[CLIENT] Package loss simulation start");
                             }
-
 
                             //should enter after sending maximum window size
                             if (w_cnt == stoi(window_size)) {
-
-                                //cout << "Checksum: " << checksum << "\n";
 
                                 response = receive_data(socket);
                                 response.pop_back();
 
                                 if (stoi(response) != checksum) {
-                                    //throw std::invalid_argument("[Client] Server responded with wrong checksum.");
+                                    //throw std::invalid_argument("[CLIENT] Server responded with wrong checksum.");
                                     //break;
-                                    logger->info("[Client] Server responded with wrong checksum");
+                                    logger->info("[CLIENT] Server responded with wrong checksum");
                                 } else {
-                                    cout << "[Client] Checksum response from Server correct\n";
-                                    logger->info("[Client] Checksum response from Server correct");
+                                    cout << "[CLIENT] Checksum response from Server correct\n";
+                                    logger->info("[CLIENT] Checksum response from Server correct");
                                 }
                                 
                                 w_cnt = 0;
@@ -227,7 +225,7 @@ int main(int argc, char* argv[]) {
                                 response.pop_back();
 
                                 if (response != to_string(ascii_vec.at(i))) {
-                                    logger->info("[Client] Server responded with wrong ACN");
+                                    logger->info("[CLIENT] Server responded with wrong ACN");
                                 }
                             }
                         }
@@ -235,47 +233,45 @@ int main(int argc, char* argv[]) {
                         if (pl_send)
                             send_data(socket, "0"); //sending 0 if -p paremeter is true, because server awaits full length of frames, which count is sended before
                                                     //without this, there would be an endless loop, server waits for one last character which will never be send
-
-                        //std::this_thread::sleep_for(std::chrono::milliseconds(550));
-
                         response = receive_data(socket);
                         response.pop_back();
 
                         try {
                             if (max_checksum != stoi(response)) {
-                                cout << "[Client] Server responded with wrong max sum: " << response << "\n";
+                                cout << "[CLIENT] Server responded with wrong max sum: " << response << "\n";
                             } else {
-                                cout << "[Client] Server responded with right max sum: " << response << "\n";
+                                cout << "[CLIENT] Server responded with right max sum: " << response << "\n";
                             }
                         } catch (std::invalid_argument const& ex) {
                             cout << response << "\n";
                         }
                         
                         socket.close(ec);
-                        cout << "[Client] From server disconnected!\n";
+                        cout << "[CLIENT] From server disconnected\n";
+                        logger->info("[CLIENT] From server disconnected");
 
                     } else {
                         socket.close();
                         cout << rang::fg::red;
-                        cout << "[Client] Server responded with wrong ACN for number of data frames\nFor security measures connection is beeing closed.\n";
-                        logger->error("[Client] Server responded with wrong ACN for number of data frames");
+                        cout << "[CLIENT] Server responded with wrong ACN for number of data frames\nFor security measures connection is beeing closed.\n";
+                        logger->error("[CLIENT] Server responded with wrong ACN for number of data frames");
                         cout << rang::style::reset;
                     }
                 } else {
                     socket.close();
                     cout << rang::fg::red;
-                    cout << "[Client] Server responded with wrong ACN for window size\nFor security measures connection is closed.\n";
-                    logger->error("[Client] Server responded with wrong ACN for window size");
+                    cout << "[CLIENT] Server responded with wrong ACN for window size\nFor security measures connection is closed.\n";
+                    logger->error("[CLIENT] Server responded with wrong ACN for window size");
                     cout << rang::style::reset;
                 }
             } else {
                 cout << rang::fg::red;
-                cout << "[Client] Could not connect to Server: \n" << ec.message();
-                logger->error("[Client] Client could not connect to the server: {0}", ec.message());
+                cout << "[CLIENT] Could not connect to Server: \n" << ec.message();
+                logger->error("[CLIENT] CLIENT could not connect to the server: {0}", ec.message());
                 cout << rang::style::reset;
             }
         } else {
-            cout << "[Client] Given window size is higher than count of random ASCII values which are to transfer.\n Window size must be lower or same count.";
+            cout << "[CLIENT] Given window size is higher than count of random ASCII values which are to transfer.\n Window size must be lower or same count.";
             cout << "Please try again with same parameters and repeat it until it is working,\nor try a minor value of the window size with \"-w\"-option!\n";
         }
     } else if (a) {
