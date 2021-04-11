@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
             socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1", ec), 9999));
 
             if (!ec) {
-                logger->info("[CLIENT] CLIENT connected to server");
+                logger->info("[CLIENT] Client connected to server");
                 string response;
                 string tmp;
                 
