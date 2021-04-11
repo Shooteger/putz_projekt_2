@@ -105,11 +105,11 @@ int main(int argc, char* argv[]) {
     bool pl_send = false;
     bool pr_after = false;
     
-    CLI::App app {"Networking Simulator"};
+    CLI::App app {"ConnectSim"};
     app.add_option("input_characters", input_chars,
          "Given characters will be random times send to server    Example: \"./connectsim asdf\"");
     app.add_option("-w,--windowsize", window_size,
-         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim 3\"")->check(CLI::PositiveNumber);
+         "Given number will be the size of the window of sliding window algorithm used for data transmission    Example: \"./connectsim -w 3\"")->check(CLI::PositiveNumber);
     app.add_option("-s,--set_logpath", logpath_new,
          "Change name of logfile or local path for client    Example: \"./connectsim -s logging/log_cs.txt");
     app.add_flag("-p,--packageloss", pl , "Simulates Package loss while sending data to server and otherwise");
@@ -293,9 +293,15 @@ int main(int argc, char* argv[]) {
         auto tmp_l_path = system(command.c_str());
         cout << rang::fg::magenta << "\n" << tmp_l_path << "\n" << rang::style::reset;
     } else if (logpath_new != "") {
-        json_obj["logpath"] = logpath_new;
-        std::ofstream o("settings.json");
-        o << std::setw(4) << json_obj << endl;
+        try {
+            json_obj["logpath"] = logpath_new;
+            std::ofstream o("settings.json");
+            o << std::setw(4) << json_obj << endl;
+
+            cout << rang::fg::green << "\n" << "Path of Logging file successfully changed!" << "\n" << rang::style::reset;
+        } catch(...) {
+            cout << rang::fg::red << "\n" << "Path of Logging file could NOT be changed!" << "\n" << rang::style::reset;
+        }
     } else {
         try {
             logger->error("Something very strange happened");
