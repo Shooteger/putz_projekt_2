@@ -176,13 +176,10 @@ int main(int argc, char* argv[]) {
                             }
 
                             if (dm) {
-                                if (int(i) <= 2) {
-                                    char tmp = static_cast<char>((rand() % (126-33)) + 33);
+                                    char tmp = static_cast<char>((rand() % (121-33)) + 34);
                                     send_data(socket, to_string(tmp));
                                     logger->info("[CLIENT] Sending manipulated data");
-                                } else {
                                     dm = false;
-                                }
                             } else if (pr) {
                                 random_count -= (int)i;
                                 change_row = i+random_count;
@@ -236,6 +233,7 @@ int main(int argc, char* argv[]) {
                         response = receive_data(socket);
                         response.pop_back();
 
+                        //cout << "response: " << response << "; mx: " << max_checksum;
                         try {
                             if (max_checksum != stoi(response)) {
                                 cout << "[CLIENT] Server responded with wrong max sum: " << response << "\n";
