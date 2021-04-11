@@ -6,6 +6,36 @@ After "commit/" you have to paste the string from Commit Tickets like /fba28d1c1
 Example: https://github.com/Shooteger/putz_projekt_2/commit/fba28d1c14a34edd5633145cb0a64749c676770d
 This will redirect you to a detailed view, which each commit changed in the project
 
+** [Released] - 12.04.2021
+*** Commit-Tickets
+/e3cb27e406d5a58e6b4f3fed55edc568775f9d76
+/c07b53a4b54843b46cd031d0e7f84383c56c9c4a
+/60e1949711c806ab95039feaf647cb74161b1a61
+/d92b5492296b1da02dc3bb6986e67568e79b04ff
+/3db128b859ab5ed3055969282a5aa51469034a52
+/0e7a60e4949aad17424602a5c81a5dcb067f8cab
+/f916ab735d2546e77823a620fec3293324af1758
+/e294540938c77ce6c74aba9c410c9cf1abe79ccb
+/9d1074fd74064625aaa8a430e802a047a06a808e
+/09cdb26a780df56c800c51dab55061a43d7ea043
+/e0ca0708ce103102c6249cf2440b896d70171d38
+/84fbd67ae0986d4a7033fff2d6aab9bd3a108682
+/ae4be74e0098d4d9a74f8dac063c1054aa444e42
+/a6a9fcb71ddac27fc738da4a792778bca2c2d6a5
+/da3e92446c795d7a2c65bf2deadfb0c0117cdbb2
+/21b6e5e455f464976604c2c951d0a91c77e54bb9
+/dc0e48ace43c0b9e1a06a6452d93097c0e54caf0
+/ef433b0a3b486a41f94c66a5803013bcc2380a9f
+/2b2c28f2cd8bd4f4bd7995327abb08059d171ab8
+
+*** Added
+-fixing window slide algorithm max_sum
+-faxing many bugs
+-adding network condition simulation
+-adding documentation
+-improving logging
+-deleting old files
+
 ** [Unreleased] - 05.04.2021
 *** Commit-Tickets
 /c0dbbfa708d46366038747c23a276290b64c399b

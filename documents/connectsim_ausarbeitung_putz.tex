@@ -50,19 +50,17 @@ NVS- Projekt 2020/21, 5AHIF
 \pagenumbering{arabic}
 
 \section{Beschreibung}
-Das Progamm ConnectSim dient dazu, eine Übertragung von Daten mittels einem Sliding Window Algorithmus darzustellen.
+Das Programm ConnectSim dient dazu, eine Übertragung von Daten mittels einem Sliding Window Algorithmus darzustellen.
 Weiters bietet das Programm noch die Funktionen, drei Fehlerarten im Networking darzustellen. Diese wären Paketverlust,
-Paketverfäschung (Datenmanulupation) und eine falsche Paketreihenfolge. Vom Sender aus werden zufällige ASCII-Zeichen, deren
+Paketverfälschung (Datenmanipulation) und eine falsche Paketreihenfolge. Vom Sender aus werden zufällige ASCII-Zeichen, deren
 Menge optional angeben werden kann, in derer dezimalen Darstellung, mittels einer Verbindung zu einem Server übertragen. Diese
-Verbindung ist vordefiniert. Der Server wird vor der Ausführung des Programms manuell vom User gestartet, dieser wartet dann auf einkommende
-Verbindungsanfragen und startet den Alogrithmus bei erfolgreicher Verbindung. \newline
-Die größe des Sliding Window Fensters veträgt Standardgemäß 1, ist aber per Kommandozeile vom User aus konfigurierbar.
-Die Daten weden Client zum Server übertragen. Zuerst wird die Anzahl, aller zu übertrageneder Datenframes, dann die größe des Sliding Window Fensters
-dem Server mitgeteilt. Danach beginnt die eigentliche Übertragung der Daten. Der Server nimmt ein Datenframe aus, addiert den Wert zu einer Checksumme 
-welche pro Fenster berechnet wird und sendet die Daten, als AKN zurück. Wurden so viele Daten aufgenommen, wie die Sliding Window größe vorher übermittelt worden
+Verbindung ist vordefiniert. Der Server wird vor der Ausführung des Programms manuell vom User gestartet, dieser wartet dann auf einkommende Verbindungsanfragen und startet den Algorithmus bei erfolgreicher Verbindung. \newline
+Die Größe des Sliding Window Fensters beträgt Standardgemäß eins, ist aber per Kommandozeile vom User aus konfigurierbar.
+Die Daten werden vom Client zum Server übertragen. Zuerst wird die Anzahl, aller zu  Datenframes, dann die Größe des Sliding Window Fensters dem Server mitgeteilt. Danach beginnt die eigentliche Übertragung der Daten. Der Server nimmt ein Datenframe, addiert den Wert zu einer Checksumme, 
+welche pro Fenster berechnet wird und sendet die Daten, als AKN zurück. Wurden so viele Daten aufgenommen, wie die Sliding Window Größe vorher übermittelt worden
 ist, sendet der Server einen AKN an den Client mit der gesamten Checksumme des Fensters und alles beginnt wieder von vorne, bis alle Daten auf diese Art übertragen worden
 sind.\newline
-Am Ende überträgt der Server nochmals die maximale Summer der Übertragenen Daten pro Fenster zum Client. Diese Summe hat sich der Client selbst vor dem Abschicken der
+Am Ende überträgt der Server nochmals die maximale Summer der zu Übertragenden Daten pro Fenster zum Client. Die Summe hat sich der Client selbst vor dem Abschicken der
 Daten gebildet. Diese wird nun verglichen ob sie dieselbe ist. 
 \newline\newline
 Das Programm gibt diesen Vorgang in einer Logdatei für den Server, und einer Logdatei für den Client aus. Der Name und Pfad der Logdatei für den Client ist frei konfigurierbar.
@@ -70,15 +68,15 @@ Es gibt noch einige weitere Funktionen, wie auch die Simulation von Netzwerkfehl
 
 
 \subsection{Sliding-Window Algorithmus Zusammenfassung}
-Das Sliding Window Protokoll wird für die Übetragung von Informationen benutzt. Eine Beschreibung ist dazu im RFC 1180 zu TCP/IP unter Absatz 7 TCP (Transmission Control Protocol).
-Im Grunde genommen bewirkt dieser Algorithmus, dass ein Client mehrer Datenframes auf einmal versenden kann, ohne das er auf ein AKN des Servers warten muss. Eine genauere Grafische Darstellung,
+Das Sliding Window Protokoll wird für die Übertragung von Informationen benutzt. Eine Beschreibung ist dazu im RFC 1180 zu TCP/IP unter Absatz 7 TCP (Transmission Control Protocol).
+Im Grunde genommen bewirkt dieser Algorithmus, dass ein Client mehrere Datenframes auf einmal versenden kann, ohne das er auf ein AKN des Servers warten muss. Eine genauere Grafische Darstellung,
 wie das Fenster über die Daten "schiebt" zeigen folgende Abb. 1 bis inklusive Abb. 3.
 
 \begin{center}
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{slidingwindow1.png}
-    \caption{Ausgangsposiiton mit Fenstergröße 3}
+    \caption{Ausgangsposition mit Fenstergröße 3}
 \end{figure}
 \end{center}
 \break
@@ -106,7 +104,7 @@ Nun wischt das Fenster um einen Index weiter nach rechts, in Abb. 2 zu sehen. De
 \break
 
 Nachdem das Fenster wieder um einen Index weitergewandert ist, rechnen wir wieder die summe des Fensters zusammen, in Abb. 3 beträgt die Fenstersumme 2. Nun wird die Summe wieder mit dem Wert in
-der Variable max\_sum verglichen. Da der Wert wieder kleiner ist, als der in max\_sum gespeicherte, bleibt max\_sum wie sie ist und unsere maximale Fenstergröße von unserem gesamten Array, ist 6.
+der Variable max\_sum verglichen. Da der Wert wieder kleiner ist, als der in max\_sum gespeicherte, bleibt max\_sum wie sie ist und unsere maximale Fenstergröße von unserem gesamten Array ist 6.
 
 \section{Bedienanleitung}
 \begin{center}
@@ -138,7 +136,7 @@ liegt. Eine Abfolge und das Ergebnis sieht man in Abb. 5.
 \end{figure}
 \end{center}
 
-Durch den normalen Aufruf des Programms mit \underline{./connectsim}, wird ConnectSim ohne speziellen Funktionen gestartet. Die Standardgröße eines Sliding Window Fensters beträgt eins, welche bei oben gezeigtem Aufruf benutzt wird, die Standardgröße von eins hat auch einen bestimmten Grund, welcher später noch genauer erläutert wird. Das Programm generiert nun zufällig oft zufällig viele (zwischen 1 und 127) ASCII-Charactere und beginnnt die Übertragung. Der Server verarbeitet diese und antwortet. Genauer in den Abb.6-7 zu sehen. Ebenfalls werden ensprechende Ausgaben auf der Konsole der Servers getätigt und in den Logfiles des Servers und des Clients geschrieben.
+Durch den normalen Aufruf des Programms mit \underline{./connectsim}, wird ConnectSim ohne speziellen Funktionen gestartet. Die Standardgröße eines Sliding Window Fensters beträgt eins, welche bei oben gezeigtem Aufruf benutzt wird, die Standardgröße von eins hat auch einen bestimmten Grund, welcher später noch genauer erläutert wird. Das Programm generiert nun zufällig oft zufällig viele (zwischen 1 und 127) ASCII-Charactere und beginnt die Übertragung. Der Server verarbeitet diese und antwortet. Genauer in den Abb.6-7 zu sehen. Ebenfalls werden entsprechende Ausgaben auf der Konsole der Servers getätigt und in den Logfiles des Servers und des Clients geschrieben.
 
 \begin{center}
 \begin{figure}[h]
@@ -197,7 +195,7 @@ Beispiel:
 \end{itemize}
 
 Flag \textbf{-d,--datamanipulation}:\newline
-Simuliert einen Packetverlust. Beim senden von Daten vom Client zum Server.
+Simuliert einen Paketverlust. Beim senden von Daten vom Client zum Server.
 Beispiel: 
 \begin{itemize}
 	\item \underline{Eingabe:} ./connectsim -d
@@ -284,7 +282,7 @@ std::cout << "max_size: " << myvector.max_size();
 max_size: 1073741823
 \end{lstlisting}
 
-Danach überprüft das Programm ob die Anzahl der Zeichen im Vektor nicht größer ist, als das angegebene Sliding Window. Falls ja wird ein entsprechender Fehler geworfen und das Programm beendet. Falls die Bedingung jedoch stimmt, dann wird ein socket erstellt
+Danach überprüft das Programm ob die Anzahl der Zeichen im Vektor nicht größer ist, als das angegebene Sliding Window. Falls ja wird ein entsprechender Fehler geworfen und das Programm beendet. Falls die Bedingung jedoch stimmt, dann wird ein Socket erstellt
 und der Client versucht sich mit dem Endpunkt zu verbinden, auf welchem der Server vorhin gestartet worden ist.
 
 \begin{center}
@@ -300,7 +298,7 @@ Die Wahl des Ports beruht auf einem Leitfaden zur Auswahl von Ports bei Networki
 \newline
 Danach wird geloggt, dass der Client sich mit dem Server verbunden hat und die Datenübertragung beginnt. Es werden zuerst die Größe der Fenster geschickt und die Anzahl aller Datenframes geschickt. Der Client speichert die schon vorhin beschriebene MAX\_SUM aller Daten zwischen und beginnt nun mit der Übertragung der eigentlichen ASCII-Zeichen jeweils in Anzahl der Fenstergröße auf einmal.
 
-Der Client überprüft, ob der Server die richtigen AKN sendet und lässt so das Fenster weiter gleiten. Falls ein falscher AKN kommen, wird ein Fehler geloggt, und das Programm fährt fort. Am Ende empfängt der Client die MAX\_SUM des Server, wenn diese mit der vorhin zwischengespeicherten des Clients übereinstimmt, kommt eine Nachricht, dass die Übertragung ohne Probleme vollzogen werden konnte. Falls nicht, wird dies auch entsprechend geloggt und ausgegeben. Der gesamte Vorgang wird auf Client und Serverseite in zwei seperate Logdateien geschrieben. Der Pfad für die des Clients steht in der settings.json Datei im \textbf{/build} - Verzeichnis. Die des Server ist fix im Code angegeben, und zwar immer im aktuellen Verzeichnis, wo sich die ausführbare Datei des Servers beim starten befindet.
+Der Client überprüft, ob der Server die richtigen AKN sendet und lässt so das Fenster weiter gleiten. Falls ein falscher AKN kommen, wird ein Fehler geloggt, und das Programm fährt fort. Am Ende empfängt der Client die MAX\_SUM des Server, wenn diese mit der vorhin zwischengespeicherten des Clients übereinstimmt, kommt eine Nachricht, dass die Übertragung ohne Probleme vollzogen werden konnte. Falls nicht, wird dies auch entsprechend geloggt und ausgegeben. Der gesamte Vorgang wird auf Client und Serverseite in zwei separate Logdateien geschrieben. Der Pfad für die des Clients steht in der settings.json Datei im \textbf{/build} - Verzeichnis. Die des Server ist fix im Code angegeben, und zwar immer im aktuellen Verzeichnis, wo sich die ausführbare Datei des Servers beim starten befindet.
 
 \subsection{Umsetzung Server}
 
