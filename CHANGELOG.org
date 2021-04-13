@@ -6,6 +6,13 @@ After "commit/" you have to paste the string from Commit Tickets like /fba28d1c1
 Example: https://github.com/Shooteger/putz_projekt_2/commit/fba28d1c14a34edd5633145cb0a64749c676770d
 This will redirect you to a detailed view, which each commit changed in the project
 
+** [Released] - 19.04.2021
+*** Commit-Tickets
+/a6d7c6cefc3698ef7cf9eb06559dd1f28b5f78cd
+/2da357244fce4c222a80b09645bae7957747659f
+*** Added
+-Fixing typos in documentation
+
 ** [Released] - 12.04.2021
 *** Commit-Tickets
 /e3cb27e406d5a58e6b4f3fed55edc568775f9d76
