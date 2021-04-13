@@ -51,14 +51,12 @@ NVS- Projekt 2020/21, 5AHIF
 
 \section{Beschreibung}
 Das Programm ConnectSim dient dazu, eine Übertragung von Daten mittels einem Sliding Window Algorithmus darzustellen.
-Weiters bietet das Programm noch die Funktionen, drei Fehlerarten im Networking darzustellen. Diese wären Paketverlust,
-Paketverfälschung (Datenmanipulation) und eine falsche Paketreihenfolge. Vom Sender aus werden zufällige ASCII-Zeichen, deren
+Weiters bietet das Programm noch die Funktionen, drei Fehlerarten im Networking darzustellen. Diese drei Fehler wären: Paketverlust,
+Paketverfälschung (Datenmanipulation) und Fehler bei der Paketreihenfolge. Vom Sender aus werden zufällige ASCII-Zeichen, deren
 Menge optional angeben werden kann, in derer dezimalen Darstellung, mittels einer Verbindung zu einem Server übertragen. Diese
 Verbindung ist vordefiniert. Der Server wird vor der Ausführung des Programms manuell vom User gestartet, dieser wartet dann auf einkommende Verbindungsanfragen und startet den Algorithmus bei erfolgreicher Verbindung. \newline
 Die Größe des Sliding Window Fensters beträgt Standardgemäß eins, ist aber per Kommandozeile vom User aus konfigurierbar.
-Die Daten werden vom Client zum Server übertragen. Zuerst wird die Anzahl, aller zu  Datenframes, dann die Größe des Sliding Window Fensters dem Server mitgeteilt. Danach beginnt die eigentliche Übertragung der Daten. Der Server nimmt ein Datenframe, addiert den Wert zu einer Checksumme, 
-welche pro Fenster berechnet wird und sendet die Daten, als AKN zurück. Wurden so viele Daten aufgenommen, wie die Sliding Window Größe vorher übermittelt worden
-ist, sendet der Server einen AKN an den Client mit der gesamten Checksumme des Fensters und alles beginnt wieder von vorne, bis alle Daten auf diese Art übertragen worden
+Die Daten werden vom Client zum Server übertragen. Zuerst wird die Anzahl, aller zu  Datenframes, dann die Größe des Sliding Window Fensters dem Server mitgeteilt. Danach beginnt die eigentliche Übertragung der Daten. Der Server nimmt ein Datenframe, addiert den Wert zu einer Checksumme, welche pro Fenster berechnet wird und sendet die Daten, als AKN zurück. Wurde die maximale Anzahl der Daten entgegengenommen (die Anzahl ist gleich der Größe des Sliding Windows), sendet der Server einen AKN an den Client mit der gesamten Checksumme des Fensters und alles beginnt wieder von vorne, bis alle Daten auf diese Art übertragen worden
 sind.\newline
 Am Ende überträgt der Server nochmals die maximale Summer der zu Übertragenden Daten pro Fenster zum Client. Die Summe hat sich der Client selbst vor dem Abschicken der
 Daten gebildet. Diese wird nun verglichen ob sie dieselbe ist. 
@@ -69,8 +67,8 @@ Es gibt noch einige weitere Funktionen, wie auch die Simulation von Netzwerkfehl
 
 \subsection{Sliding-Window Algorithmus Zusammenfassung}
 Das Sliding Window Protokoll wird für die Übertragung von Informationen benutzt. Eine Beschreibung ist dazu im RFC 1180 zu TCP/IP unter Absatz 7 TCP (Transmission Control Protocol).
-Im Grunde genommen bewirkt dieser Algorithmus, dass ein Client mehrere Datenframes auf einmal versenden kann, ohne das er auf ein AKN des Servers warten muss. Eine genauere Grafische Darstellung,
-wie das Fenster über die Daten "schiebt" zeigen folgende Abb. 1 bis inklusive Abb. 3.
+Im Grunde genommen bewirkt dieser Algorithmus, dass ein Client mehrere Datenframes auf einmal versenden kann, ohne das er auf ein AKN des Servers warten muss. Eine genauere grafische Darstellung,
+wie das Fenster über die Daten "schiebt", zeigen folgende Abb. 1 bis inklusive Abb. 3.
 
 \begin{center}
 \begin{figure}[h]
@@ -81,8 +79,7 @@ wie das Fenster über die Daten "schiebt" zeigen folgende Abb. 1 bis inklusive A
 \end{center}
 \break
 
-Das Fenster hat die immer die Größe 3, die Summe aller Daten im dargestellten Fenster beträgt 6. Diese Zwischensumme wird in einer Variable max\_sum zwischengespeichert, nämlich
-setzen wir diese gleich dem Wert in current\_sum, dies ist die Summe welche 6 beträgt. Weiter geht es mit dem Schritt in Abbildung 2.
+Das Fenster hat die immer die Größe 3, die Summe aller Daten im dargestellten Fenster beträgt 6. Diese Zwischensumme wird in einer Variable max\_sum zwischengespeichert, nämlich setzen wir diese gleich dem Wert in current\_sum, dies ist die Summe welche 6 beträgt. Weiter geht es mit dem Schritt in Abbildung 2.
 
 \begin{center}
 \begin{figure}[h]
@@ -103,8 +100,7 @@ Nun wischt das Fenster um einen Index weiter nach rechts, in Abb. 2 zu sehen. De
 \end{center}
 \break
 
-Nachdem das Fenster wieder um einen Index weitergewandert ist, rechnen wir wieder die summe des Fensters zusammen, in Abb. 3 beträgt die Fenstersumme 2. Nun wird die Summe wieder mit dem Wert in
-der Variable max\_sum verglichen. Da der Wert wieder kleiner ist, als der in max\_sum gespeicherte, bleibt max\_sum wie sie ist und unsere maximale Fenstergröße von unserem gesamten Array ist 6.
+Nachdem das Fenster wieder um einen Index weitergewandert ist, wird abermals die Summe des Fenster ermittelt, in Abb. 3 beträgt die Fenstersumme 2. Nun wird die Summe wieder mit dem Wert in der Variable max\_sum verglichen. Da der Wert wieder kleiner ist, als der in max\_sum gespeicherte, bleibt max\_sum wie sie ist und unsere maximale Fenstergröße von unserem gesamten Array ist 6.
 
 \section{Bedienanleitung}
 \begin{center}
@@ -125,8 +121,7 @@ Zeigt die Hilfe für das Programm an, liefert das Menü wie in Abb. 4 zurück.
 \break
 
 \subsection{Befehle}
-Der Server muss unabhängig vom Programm \textbf{zuerst} gestartet werden und manuell vom User. Dies macht man mittels dem Befehl \underline{./server} in dem Verzeichnis, wo die Datei zum starten
-liegt. Eine Abfolge und das Ergebnis sieht man in Abb. 5.
+Der Server muss unabhängig vom Programm \textbf{zuerst} gestartet werden und manuell vom User. Dies macht man mittels dem Befehl \underline{./server} in dem Verzeichnis, wo die Datei zum starten gelegen hat. Eine Abfolge und das Ergebnis sieht man in Abb. 5.
 
 \begin{center}
 \begin{figure}[h]
@@ -165,7 +160,7 @@ Wenn man beim Aufruf des Programms, wie zum Beispiel  \underline{./connectsim as
 \end{itemize}
 
 Option \textbf{-w,--windowsize TEXT:POSITIVE}:\newline
-Startet das Programm und ersetzt die default-Sliding Window Größe auf den angegebenen Wert. Das Programm beendet sich, falls diese Zahl Größer ist, als die Anzahl der zu Übertragenden Elemente. Falls dies der Fall ist, wird eine Nachricht ausgegeben, wie der User in dem Fall verfahren sollte. Zum Beispiel falls der User eine Größe von 8 für das Fenster eingibt, aber durch das Zufallsbedingte auswählen der ASCII Charakter Anzahl nur 5 Charaktere erstellt werden, muss dieser Fall angefangen werden, da die Startbedienungen für den Algorithmus nicht korrekt sind.\\
+Startet das Programm und ersetzt die default-Sliding Window Größe auf den angegebenen Wert. Das Programm beendet sich, falls diese Zahl größer ist, als die Anzahl der zu Übertragenden Elemente. Ist dies der Fall, wird eine Nachricht ausgegeben, wie der User in dem nun weiter verfahren sollte. Zum Beispiel, falls der User eine Größe von 8 für das Fenster eingibt, aber durch das zufallsbedingte auswählen der ASCII Charaktere, nur 5 dieser erstellt werden, muss dieser Fall abgefangen werden, da die Startbedienungen für den Algorithmus nicht korrekt sind.\\
 Erwartet eine positive ganze Zahl als Eingabe.
 Beispiel: 
 \begin{itemize}
@@ -186,7 +181,7 @@ Path of Logging file successfully changed!\\
 \end{itemize}
 
 Flag \textbf{-p,--packageloss}:\newline
-Simuliert einen Packetverlust. Beim senden vom Client zum Server
+Simuliert einen Packetverlust. Beim Senden vom Client zum Server
 Beispiel: 
 \begin{itemize}
 	\item \underline{Eingabe:} ./connectsim -p
@@ -233,13 +228,13 @@ den absoluten Pfad der Lockdatei für den Client zurück.
 
 \section{Programmumsetzung}
 
-Das schreiben und lesen des Client und des Servers sind jeweils in zwei gleichen Funktionen realisiert. Für das schreiben wurde die Funktion \textbf{asio::write} benutzt. Diese Funktion erwartet sich eine Referenz auf ein Socket und eine Nachricht. Beim senden mit der \textbf{write} Funktion von asio muss die mitgelieferte Nachricht eine const variable sein:
+Das Schreiben und lesen des Clients und des Servers, sind jeweils in zwei identischen Funktionen realisiert. Für das Schreiben, wurde die Funktion \textbf{asio::write} benutzt. Diese Funktion erwartet sich eine Referenz auf ein Socket und eine Nachricht. Beim senden mit der \textbf{write} Funktion von asio muss die mitgelieferte Nachricht eine const variable sein:
 
 \begin{lstlisting}
 void send_data(asio::ip::tcp:.socket& socket, const string message)
 \end{lstlisting}
 
-Das lesen wurde mittels der asio Funktion \textbf{asio::read\_until()} realisiert. Diese erwartet sich einen Referenz auf ein Socket, einen streambuffer und das Zeichen, bei welchem die Funktion aufhört zu lesen, bis zu diesem Zeichen liest diese aus dem Stream ein. In diesem Fall hier bis zum Zeichen \textbf{/n} also einem Linebreak.
+Das lesen wurde mittels der asio Funktion \textbf{asio::read\_until()} realisiert. Diese erwartet sich eine Referenz auf ein Socket, einen streambuffer und das Zeichen, bei welchem die Funktion aufhört zu lesen, bis zu diesem Zeichen liest diese aus dem Stream dann ein. In diesem Fall hier, bis zum Zeichen \textbf{/n} also einem Linebreak.
 
 \begin{lstlisting}
 void receive_data(asio::ip::tcp:.socket& socket)
@@ -253,7 +248,7 @@ void max_sum(vector<char> ascii_vec, int window_size, int size)
 Diese Funktion bekommt den Vektor mit den zu übertragenden Daten, die Länge des Sliding Windows und die Anzahl aller Elemente im Vektor mit. Er liefert die größte maximale Summe eines Fenster zurück, oder -1, falls dass Sliding Window Fenster größer ist, als die Anzahl der ASCII Elemente.
 
 \subsection{Umsetzung Client}
-Zuerst wurde ein Objektorientierter Ansatz verwendet, deswegen sind in frühere commits des Repository noch .h Dateien und Klassen
+Zuerst wurde ein objektorientierter Ansatz verwendet, deswegen sind in früheren commits des Repository, noch .h Dateien und Klassen
 zu sehen. Diese wurden aufgrund unnötiger Komplexität und fehlenden Mehrwert im Bezug auf Aufwand verworfen.\\
 Nach dem Parsen wird der ein \textbf{basic\_logger} von der Klasse \textbf{spdlog}, mit dem Pfad aus der Datei \textbf{settings.json}, erstellt.\newline
 
@@ -298,7 +293,7 @@ Die Wahl des Ports beruht auf einem Leitfaden zur Auswahl von Ports bei Networki
 \newline
 Danach wird geloggt, dass der Client sich mit dem Server verbunden hat und die Datenübertragung beginnt. Es werden zuerst die Größe der Fenster geschickt und die Anzahl aller Datenframes geschickt. Der Client speichert die schon vorhin beschriebene MAX\_SUM aller Daten zwischen und beginnt nun mit der Übertragung der eigentlichen ASCII-Zeichen jeweils in Anzahl der Fenstergröße auf einmal.
 
-Der Client überprüft, ob der Server die richtigen AKN sendet und lässt so das Fenster weiter gleiten. Falls ein falscher AKN kommen, wird ein Fehler geloggt, und das Programm fährt fort. Am Ende empfängt der Client die MAX\_SUM des Server, wenn diese mit der vorhin zwischengespeicherten des Clients übereinstimmt, kommt eine Nachricht, dass die Übertragung ohne Probleme vollzogen werden konnte. Falls nicht, wird dies auch entsprechend geloggt und ausgegeben. Der gesamte Vorgang wird auf Client und Serverseite in zwei separate Logdateien geschrieben. Der Pfad für die des Clients steht in der settings.json Datei im \textbf{/build} - Verzeichnis. Die des Server ist fix im Code angegeben, und zwar immer im aktuellen Verzeichnis, wo sich die ausführbare Datei des Servers beim starten befindet.
+Der Client überprüft, ob der Server die richtigen AKN sendet und lässt so das Fenster weiter gleiten. Falls ein falscher AKN kommen, wird ein Fehler geloggt, und das Programm fährt fort. Am Ende empfängt der Client die MAX\_SUM des Server, wenn diese mit der vorhin zwischengespeicherten des Clients übereinstimmt, kommt eine Nachricht, dass die Übertragung ohne Probleme vollzogen werden konnte. Falls nicht, wird dies auch entsprechend geloggt und ausgegeben. Der gesamte Vorgang wird auf Client und Serverseite in zwei separate Logdateien geschrieben. Der Pfad für die des Clients steht in der settings.json Datei im \textbf{/build} - Verzeichnis. Die des Servers ist fix im Code angegeben, und zwar immer im aktuellen Verzeichnis, wo sich die ausführbare Datei des Servers beim Starten befindet.
 
 \subsection{Umsetzung Server}
 
@@ -329,7 +324,7 @@ Diese Funktion erwartet eine ein Socket-Objekt und ein ein \textbf{shared\_point
 \end{figure}
 \end{center}
 
-In der Funktion \textbf{process()} wird zuerst die die Sliding Window Fenstergröße empfangen, dann die Anzahl aller zu Erwartenden Daten. Später, vor der Verarbeitung der eigentlichen ASCII Werte wird noch eine Uhrzeit gespeichert und bei jedem Schleifendurchlauf wird diese mit der aktuellen Zeit am Server verglichen, der gesamte Prozess darf aus Sicherheitsgründen nicht mehr als sechs Sekunden dauern. Falls diese Zeit überschritten wird, wird beim nächsten Schleifendurchlauf das Socket geschlossen, und es können auf diesem keine Daten mehr gesendet und empfangen werden.\\
+In der Funktion \textbf{process()} wird zuerst die die Sliding Window Fenstergröße empfangen, dann die Anzahl aller zu erwartenden Daten. Später, aber noch vor der Verarbeitung der eigentlichen ASCII Werte, wird noch eine Uhrzeit gespeichert und bei jedem Schleifendurchlauf, wird diese mit der aktuellen Zeit am Server verglichen, der gesamte Prozess darf aus Sicherheitsgründen nicht mehr als sechs Sekunden dauern. Falls diese Zeit überschritten wird, wird beim nächsten Schleifendurchlauf das Socket geschlossen, und es können auf diesem keine Daten mehr gesendet und empfangen werden.\\
 Der Server loggt alle Ereignisse und gibt den Ablauf auch in der Konsole aus. Jeden AKN und die aktuelle Checksumme des Algorithmus. Am Ende wird mit der \textbf{max\_sum} noch die größte Summe berechnet und übertragen. Danach beendet der Server den Socket nach einer 90 Millisekunden langen Wartezeit. Dies ist aufgrund von Performance und des speziellen Programmablaufes künstlich erzeugt worden.
 
 \break
@@ -359,6 +354,6 @@ Der Server loggt alle Ereignisse und gibt den Ablauf auch in der Konsole aus. Je
 	\item \underline{Folie distsys1.pdf aus dem NVS Unterricht und Folie 26-, 27- und 28\_tcpip\_programming.pdf}
 \end{itemize}
 
-\textbf{Alle benutzen Bilder sind frei für akademische Zwecke zu benutzen oder das Urheberrecht liegt beim Verfasser (Maurice Putz)}
+\textbf{Alle benutzten Bilder sind frei für akademische Zwecke zu benutzen oder das Urheberrecht liegt beim Verfasser (Maurice Putz)}
 
 \end{document}
